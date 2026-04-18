@@ -1,3 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
+using tser;
+using tser.Screen;
+using tser.Screen.Screenshots;
+
 namespace tser
 {
     internal static class Program
@@ -8,10 +13,41 @@ namespace tser
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
+            var services = new ServiceCollection();
+
+            services.AddSingleton<AppSettings>();
+            services.AddSingleton<RegionManager>();
+            services.AddSingleton<InputSimulator>();
+            services.AddSingleton<ScreenAnalyzer>();
+
+            services.AddTransient<MainActionHandler>();
+
+            services.AddTransient<SpamQHandler>();
+            services.AddTransient<SpamEHandler>();
+            services.AddTransient<FastLootHandler>();
+
+            services.AddTransient<Select43Handler>();
+            services.AddTransient<Select52Handler>();
+            services.AddTransient<Select53Handler>();
+            services.AddTransient<Select61Handler>();
+            services.AddTransient<Select62Handler>();
+
+            services.AddTransient<BuyOrdersHandler>();
+            services.AddTransient<NewBuyOrderHandler>();
+            services.AddTransient<SellHandler>();
+            services.AddTransient<SellOrdersHandler>();
+            services.AddTransient<BuyHandler>();
+
+            services.AddTransient<BuySellItemFullScreen>();
+
+            services.AddTransient<MainForm>();
+            services.AddTransient<RegionManagerForm>();
+            services.AddTransient<AskNameForm>();
+
+            var provider = services.BuildServiceProvider();
+
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run(provider.GetRequiredService<MainForm>());
         }
     }
 }

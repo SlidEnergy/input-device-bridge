@@ -334,6 +334,14 @@ namespace tser
             await MoveAndClick(randomX, randomY);
         }
 
+        public async Task MoveAndClick(Rectangle rect)
+        {
+            int x = _rnd.Next(rect.X, rect.X + rect.Width);
+            int y = _rnd.Next(rect.Y, rect.Y + rect.Height);
+
+            await MoveAndClick(x, y);
+        }
+
         public void MoveSmooth(int x1, int y1, int x2, int y2)
         {
             // Определяем границы прямоугольника
@@ -348,6 +356,14 @@ namespace tser
 
             // Вызываем первый метод
             MoveSmooth(randomX, randomY);
+        }
+
+        public void MoveSmooth(Rectangle rect)
+        {
+            int x = _rnd.Next(rect.X, rect.X + rect.Width);
+            int y = _rnd.Next(rect.Y, rect.Y + rect.Height);
+
+            MoveSmooth(x, y);
         }
 
         private void SendMoveClamped(int dx, int dy)

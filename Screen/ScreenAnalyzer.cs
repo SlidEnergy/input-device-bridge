@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
@@ -10,15 +11,25 @@ using Tesseract;
 
 namespace tser
 {
-    public class ScreenAnalyzer
+    public class ScreenAnalyzer: IDisposable
     {
         private readonly Dictionary<string, Mat> _templates = new();
         private readonly double _threshold;
         private const int SELECT_LIST_TOTAL_LINES_ON_SCREEN = 6;
+        private TesseractEngine ocr;
 
-        public ScreenAnalyzer(double threshold = 0.8)
+        public ScreenAnalyzer()
         {
+            double threshold = 0.8;
             _threshold = threshold;
+        }
+
+        public void Init()
+        {
+            // OCR
+            ocr = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
+            ocr.SetVariable("tessedit_char_whitelist", "0123456789,");
+            ocr.SetVariable("classify_bln_numeric_mode", "1"); // Tesseract “numeric mode”
         }
 
         /// <summary>
@@ -178,7 +189,7 @@ namespace tser
             var text = GetText(region);
 
             string digitsOnly = new string(text.Where(c => char.IsDigit(c)).ToArray());
-            Console.WriteLine(digitsOnly); // Например, "12345"
+            Debug.WriteLine(digitsOnly); // Например, "12345"
 
             var number = Int32.Parse(digitsOnly);
 
@@ -208,11 +219,6 @@ namespace tser
             //Cv2.MorphologyEx(processed, processed, MorphTypes.Close, kernel);
             //Cv2.ImWrite("processed3.png", processed);
 
-            // OCR
-            using var ocr = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
-            ocr.SetVariable("tessedit_char_whitelist", "0123456789,");
-            ocr.SetVariable("classify_bln_numeric_mode", "1"); // Tesseract “numeric mode”
-
             using var pix = MatToPix(row); // твой конвертер Mat -> Pix
             using var page = ocr.Process(pix);
             string text = page.GetText();
@@ -224,6 +230,11 @@ namespace tser
         {
             byte[] bytes = mat.ImEncode(".png");
             return Pix.LoadFromMemory(bytes);
+        }
+
+        public void Dispose()
+        {
+            ocr?.Dispose();
         }
     }
 }

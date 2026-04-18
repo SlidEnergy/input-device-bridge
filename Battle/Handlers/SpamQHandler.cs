@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace tser
 {
-    internal class QuickFrostHandle
+    internal class SpamQHandler
     {
         private InputSimulator sim;
         private CancellationTokenSource _cts;
         private Random _rnd = new Random();
 
-        public QuickFrostHandle(InputSimulator sim)
+        public SpamQHandler(InputSimulator sim)
         {
             this.sim = sim;
         }

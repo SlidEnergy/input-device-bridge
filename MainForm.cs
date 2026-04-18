@@ -1,10 +1,10 @@
-using OpenCvSharp.ML;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace tser
 {
-    public partial class Form1 : Form
+    internal partial class MainForm : Form
     {
         private const int XBUTTON1 = 0x0001;
         private const int XBUTTON2 = 0x0002;
@@ -12,27 +12,33 @@ namespace tser
 
         private InputSimulator inputSimulator = new InputSimulator();
 
-        private MainActionHandler _mainActionHandler;
-        private BuyHandler handler;
-        private SellHandler handler2;
         private Select43Handler handler43;
         private Select52Handler handler52;
         private Select53Handler handler53;
         private Select61Handler handler61;
         private Select62Handler handler62;
-        private QuickFrostHandle _quickFrostHandler;
+        private SpamQHandler _spamQHandler;
+        private SpamEHandler _spamEHandler;
+
         private Kmh _kmh;
+        private AppSettings _settings;
+        private readonly IServiceProvider _serviceProvider;
+        private RegionManager _regionManager;
 
         //SerialDebugReader _serialReader;
 
         public static double ScaleX = 1.0;
         public static double ScaleY = 1.0;
 
-        public Form1()
+        public MainForm(IServiceProvider provider)
         {
             InitializeComponent();
 
-            inputSimulator.OpenSerialPort();
+            _serviceProvider = provider;
+
+            inputSimulator = provider.GetRequiredService<InputSimulator>();
+            _regionManager = provider.GetRequiredService<RegionManager>();
+            _settings = provider.GetRequiredService<AppSettings>();
 
             _kmh = new Kmh(true);
             _kmh.KeyDown += _kmh_KeyDown;
@@ -40,15 +46,17 @@ namespace tser
             _kmh.MouseUp += _kmh_MouseUp;
             _kmh.KeyUp += _kmh_KeyUp;
 
-            _mainActionHandler = new MainActionHandler(inputSimulator);
-            handler = new BuyHandler(inputSimulator);
-            handler2 = new SellHandler(inputSimulator);
-            handler43 = new Select43Handler(inputSimulator);
-            handler52 = new Select52Handler(inputSimulator);
-            handler53 = new Select53Handler(inputSimulator);
-            handler61 = new Select61Handler(inputSimulator);
-            handler62 = new Select62Handler(inputSimulator);
-            _quickFrostHandler = new QuickFrostHandle(inputSimulator);
+            handler43 = _serviceProvider.GetRequiredService<Select43Handler>();
+            handler52 = _serviceProvider.GetRequiredService<Select52Handler>();
+            handler53 = _serviceProvider.GetRequiredService<Select53Handler>();
+            handler61 = _serviceProvider.GetRequiredService<Select61Handler>();
+            handler62 = _serviceProvider.GetRequiredService<Select62Handler>();
+            _spamQHandler = _serviceProvider.GetRequiredService<SpamQHandler>();
+            _spamEHandler = _serviceProvider.GetRequiredService<SpamEHandler>();
+
+            _settings.TradingSettings.AllowedBestPriceOrderPosition = (int)allowedBestPriceOrderPositionNumericUpDown.Value;
+            _settings.BattleSettings.LootStrategy = bestLootStrategyRadioButton.Checked ? LootStrategy.Best : LootStrategy.All;
+
 
             //_serialReader = new SerialDebugReader("COM4", 115200);
 
@@ -61,11 +69,39 @@ namespace tser
 
         }
 
+        private async void Form1_Shown(object sender, EventArgs e)
+        {
+            _ = MonitorPortAsync();
+        }
+
+        private CancellationTokenSource _cts = new();
+
+        private async Task MonitorPortAsync()
+        {
+            while (!_cts.Token.IsCancellationRequested)
+            {
+                if (!inputSimulator.IsOpen)
+                {
+                    try
+                    {
+                        inputSimulator.OpenSerialPort();
+                        Debug.WriteLine("COM port opened");
+                    }
+                    catch
+                    {
+                        // игнор, пробуем снова
+                    }
+                }
+
+                await Task.Delay(2000, _cts.Token);
+            }
+        }
+
         private bool _kmh_KeyDown(int wParam, KBDLLHOOKSTRUCT lParam)
         {
             try
             {
-                if (buyAndSellRadioButton.Checked)
+                if (numPadCheckBox.Checked)
                 {
                     if (lParam.vkCode == 0x64)
                     {
@@ -183,15 +219,33 @@ namespace tser
                     {
                         //const int VK_CONTROL = 0x11;
                         //bool ctrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
-
-                        RunAsync(_mainActionHandler.Run);
+                        var handler = _serviceProvider.GetRequiredService<MainActionHandler>();
+                        RunAsync(handler.Run);
 
                         return true; // событие обработано
+                    }
+                    else if (newBuyOrderRadioButton.Checked)
+                    {
+                        var handler = _serviceProvider.GetRequiredService<NewBuyOrderHandler>();
+                        RunAsync(handler.Run);
+                        return true;
                     }
                     else if (spamQRadioButton.Checked && spamActivated == false)
                     {
                         spamActivated = true;
-                        RunAsync(_quickFrostHandler.Activate);
+                        RunAsync(_spamQHandler.Activate);
+                        return true;
+                    }
+                    else if (spamERadioButton.Checked && spamActivated == false)
+                    {
+                        spamActivated = true;
+                        RunAsync(_spamEHandler.Activate);
+                        return true;
+                    }
+                    else if (fastLootRadioButton.Checked)
+                    {
+                        var handler = _serviceProvider.GetRequiredService<FastLootHandler>();
+                        RunAsync(handler.Run);
                         return true;
                     }
 
@@ -240,7 +294,15 @@ namespace tser
                         spamActivated == true)
                     {
                         spamActivated = false;
-                        RunAsync(_quickFrostHandler.Deactivate);
+                        RunAsync(_spamQHandler.Deactivate);
+                        return true;
+                    }
+
+                    if (spamERadioButton.Checked &&
+                     spamActivated == true)
+                    {
+                        spamActivated = false;
+                        RunAsync(_spamEHandler.Deactivate);
                         return true;
                     }
 
@@ -292,8 +354,34 @@ namespace tser
         {
             MouseCalibration calibration = new MouseCalibration(inputSimulator);
             var result = calibration.Calibrate();
-            Form1.ScaleX = result.scaleX;
-            Form1.ScaleY = result.scaleY;
+            MainForm.ScaleX = result.scaleX;
+            MainForm.ScaleY = result.scaleY;
+        }
+
+        private void lootAllCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            _settings.BattleSettings.LootStrategy = bestLootStrategyRadioButton.Checked ? LootStrategy.Best : LootStrategy.All;
+        }
+
+        private void regionManagerButton_Click(object sender, EventArgs e)
+        {
+            using var form = _serviceProvider.GetRequiredService<RegionManagerForm>();
+
+            form.ShowDialog();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _cts.Cancel();
+            //_regionManager.Save();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            _regionManager.InitRegions();
+
+            var analyzer = _serviceProvider.GetRequiredService<ScreenAnalyzer>();
+            analyzer.Init();
         }
     }
 }

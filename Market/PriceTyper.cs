@@ -3,8 +3,9 @@
 namespace tser
 {
 
-    public class PriceTyper
+    internal class PriceTyper
     {
+        private Random _rnd = new Random();
         private readonly InputSimulator _sim;
 
         const int VK_0 = 0x30;
@@ -18,15 +19,15 @@ namespace tser
         const int VK_8 = 0x38;
         const int VK_9 = 0x39;
 
-        public PriceTyper()
+        public PriceTyper(InputSimulator inputSimulator)
         {
-            _sim = new InputSimulator();
+            _sim = inputSimulator;
         }
 
         /// <summary>
         /// Печатает цену на клавиатуре, принимая int без разделителей.
         /// </summary>
-        public void TypePrice(int price)
+        public async Task TypePrice(int price)
         {
             string priceStr = price.ToString(); // "12345"
 
@@ -35,8 +36,9 @@ namespace tser
                 if (char.IsDigit(c))
                 {
                     int key = DigitToKeyCode(c);
-                    _sim.KeyPress(key);
-                    System.Threading.Thread.Sleep(20);
+                   _sim.KeyPress(key);
+                    await Task.Delay(45 + _rnd.Next(11)); // 40..50
+                    //System.Threading.Thread.Sleep(40);
                 }
             }
         }

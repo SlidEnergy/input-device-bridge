@@ -13,6 +13,8 @@ namespace tser
     {
         SerialPort _serialPort;
 
+        public bool IsOpen => _serialPort.IsOpen;
+
         public InputSimulator()
         {
             _serialPort = new SerialPort("COM5", 115200)

@@ -2,22 +2,17 @@
 {
     internal class BuyHandler
     {
-        private ScreenAnalyzer _analyzer = new ScreenAnalyzer(threshold: 0.85);
+        private ScreenAnalyzer _analyzer;
         private Rectangle _bestBuyPriceRegion = new Rectangle(1260, 360, 80, 25);
         private Rectangle _bestSellPriceRegion = new Rectangle(1017, 360, 80, 25);
         private Mover mover;
         private InputSimulator sim;
 
-        public BuyHandler(InputSimulator inputSimulator)
+        public BuyHandler(InputSimulator inputSimulator, ScreenAnalyzer screenAnalyzer)
         {
+            _analyzer = screenAnalyzer;
             sim = inputSimulator;
             mover = new Mover(sim);
-            // Добавляем шаблоны
-            //analyzer.AddTemplate("main_buy", "templates/main_buy.png");
-            //analyzer.AddTemplate("main_sell", "templates/main_sell.png");
-            //analyzer.AddTemplate("main_create_buy_order", "templates/main_create_buy_order.png");
-            //analyzer.AddTemplate("main_orders", "templates/main_orders.png");
-            //analyzer.AddTemplate("main_suits", "templates/main_suits.png");
         }
 
         public async Task Run()
