@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace tser
 {
-    internal enum ItemQuality
+    internal enum ItemQuality: int
     {
-        Normal = 0,
-        Good = 1,
-        Outstanding = 2,
-        Excelent = 3,
-        Masterpiece = 4,
-        All = 5
+        Normal = 1,
+        Good = 2,
+        Outstanding = 4,
+        Excelent = 8,
+        Masterpiece = 16
     }
 }

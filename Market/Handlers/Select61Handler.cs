@@ -11,7 +11,7 @@
             mover = new Mover(sim);
         }
 
-        public async Task Run()
+        public async Task Run(HandlerContext context)
         {
             await mover.MoveAndClick(457, 393, 579, 403);
 

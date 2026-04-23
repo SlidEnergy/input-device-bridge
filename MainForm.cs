@@ -1,6 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using static System.Net.Mime.MediaTypeNames;
+using System.Windows.Forms;
+using System.Text.Json;
+using tser.Battle.Maps;
 
 namespace tser
 {
@@ -24,21 +28,27 @@ namespace tser
         private AppSettings _settings;
         private readonly IServiceProvider _serviceProvider;
         private RegionManager _regionManager;
+        private MapsManager _mapManager;
 
         //SerialDebugReader _serialReader;
 
         public static double ScaleX = 1.0;
         public static double ScaleY = 1.0;
 
+        private HandlerContext uiContext = new HandlerContext();
+
         public MainForm(IServiceProvider provider)
         {
             InitializeComponent();
+
+            uiContext.SynchronizationContext = SynchronizationContext.Current;
 
             _serviceProvider = provider;
 
             inputSimulator = provider.GetRequiredService<InputSimulator>();
             _regionManager = provider.GetRequiredService<RegionManager>();
             _settings = provider.GetRequiredService<AppSettings>();
+            _mapManager = provider.GetRequiredService<MapsManager>();
 
             _kmh = new Kmh(true);
             _kmh.KeyDown += _kmh_KeyDown;
@@ -56,6 +66,7 @@ namespace tser
 
             _settings.TradingSettings.AllowedBestPriceOrderPosition = (int)allowedBestPriceOrderPositionNumericUpDown.Value;
             _settings.BattleSettings.LootStrategy = bestLootStrategyRadioButton.Checked ? LootStrategy.Best : LootStrategy.All;
+            _settings.BattleSettings.OpenLootWindow = openLootWindowCheckBox.Checked;
 
 
             //_serialReader = new SerialDebugReader("COM4", 115200);
@@ -187,13 +198,13 @@ namespace tser
             return false;
         }
 
-        private void RunAsync(Func<Task> handler)
+        private void RunAsync(Func<HandlerContext, Task> handler)
         {
             Task.Run(async () =>
             {
                 try
                 {
-                    await handler();
+                    await handler(uiContext);
                 }
                 catch (Exception ex)
                 {
@@ -248,27 +259,32 @@ namespace tser
                         RunAsync(handler.Run);
                         return true;
                     }
+                    else if (gateHelperRadioButton.Checked)
+                    {
+                        var handler = _serviceProvider.GetRequiredService<GateHelperHandler>();
+                        RunAsync(handler.Run);
 
-                    return true;
+                        return true;
+                    }
                 }
 
-                if ((lParam.mouseData >> 16) == XBUTTON1)
-                {
-                    if (this.WindowState == FormWindowState.Minimized)
-                        this.WindowState = FormWindowState.Normal;
+                //if ((lParam.mouseData >> 16) == XBUTTON1)
+                //{
+                //    if (this.WindowState == FormWindowState.Minimized)
+                //        this.WindowState = FormWindowState.Normal;
 
-                    var pos = Cursor.Position;
+                //    var pos = Cursor.Position;
 
-                    this.StartPosition = FormStartPosition.Manual;
-                    this.Location = pos;
+                //    this.StartPosition = FormStartPosition.Manual;
+                //    this.Location = pos;
 
-                    if (!this.Visible)
-                        this.Show();
+                //    if (!this.Visible)
+                //        this.Show();
 
-                    this.Show();
-                    this.Activate();
-                    return true;
-                }
+                //    this.Show();
+                //    this.Activate();
+                //    return true;
+                //}
             }
             catch (Exception ex)
             {
@@ -347,7 +363,20 @@ namespace tser
 
         private void testButton_Click(object sender, EventArgs e)
         {
-            RunAsync(handler43.Run);
+            RunAsync(async (HandlerContext context) =>
+            {
+                var cursor = Cursor.Position;
+
+                context.SynchronizationContext.Post(_ =>
+                {
+                    var form = new GateHelperForm();
+                    form.StartPosition = FormStartPosition.Manual;
+                    form.Location = new Point(cursor.X + 20, cursor.Y + 20);
+                    form.SetText("test text title");
+                    form.Show();
+                    form.InitAutoClose(Cursor.Position);
+                }, null);
+            });
         }
 
         private void calibrateButton_Click(object sender, EventArgs e)
@@ -382,6 +411,16 @@ namespace tser
 
             var analyzer = _serviceProvider.GetRequiredService<ScreenAnalyzer>();
             analyzer.Init();
+        }
+
+        private async void gateHelperRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            await _mapManager.Load();
+        }
+
+        private void openLootWindowCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            _settings.BattleSettings.OpenLootWindow = openLootWindowCheckBox.Checked;
         }
     }
 }

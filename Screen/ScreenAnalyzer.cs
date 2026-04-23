@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using OpenCvSharp.Text;
 using Tesseract;
 
 namespace tser
@@ -16,20 +18,27 @@ namespace tser
         private readonly Dictionary<string, Mat> _templates = new();
         private readonly double _threshold;
         private const int SELECT_LIST_TOTAL_LINES_ON_SCREEN = 6;
-        private TesseractEngine ocr;
+        private TesseractEngine numericOcr;
+        private TesseractEngine textOcr;
 
         public ScreenAnalyzer()
         {
-            double threshold = 0.8;
+            double threshold = 0.2;
             _threshold = threshold;
         }
 
         public void Init()
         {
             // OCR
-            ocr = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
-            ocr.SetVariable("tessedit_char_whitelist", "0123456789,");
-            ocr.SetVariable("classify_bln_numeric_mode", "1"); // Tesseract “numeric mode”
+            numericOcr = new TesseractEngine(@"./assets/tessdata", "eng", EngineMode.Default);
+            numericOcr.SetVariable("tessedit_char_whitelist", "0123456789,");
+            numericOcr.SetVariable("classify_bln_numeric_mode", "1"); // Tesseract “numeric mode”
+
+            textOcr = new TesseractEngine(@"./assets/tessdata", "eng", EngineMode.Default);
+            textOcr.SetVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789- ");
+            //textOcr.SetVariable("tessedit_char_whitelist", "");
+            textOcr.SetVariable("classify_bln_numeric_mode", "0");
+            textOcr.DefaultPageSegMode = PageSegMode.SingleLine;
         }
 
         /// <summary>
@@ -41,6 +50,11 @@ namespace tser
         //    _templates[name] = mat;
         //}
 
+        public void ClearTemplates()
+        {
+            _templates.Clear();
+        }
+
         public void AddTemplate(string name, string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
@@ -49,7 +63,8 @@ namespace tser
                 return;
             }
 
-            var mat = Cv2.ImRead(filePath, ImreadModes.Unchanged);
+            //var mat = Cv2.ImRead(filePath, ImreadModes.Unchanged);
+            var mat = Cv2.ImRead(filePath, ImreadModes.Color);
 
             if (mat.Empty())
             {
@@ -64,7 +79,7 @@ namespace tser
                     Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2BGR);
 
                 // Приводим к серому, чтобы ускорить поиск
-                Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
+                //Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
 
                 // Приводим к 8-битному типу, если нужно
                 if (mat.Type() != MatType.CV_8U)
@@ -77,6 +92,46 @@ namespace tser
             {
                 Console.WriteLine($"[EXCEPTION] Error processing template '{name}': {ex.Message}");
             }
+        }
+
+        public Mat CreateTemplate(string name, string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+            {
+                Console.WriteLine($"[WARN] Template file not found: {filePath}");
+                return null;
+            }
+
+            var mat = Cv2.ImRead(filePath, ImreadModes.Unchanged);
+
+            if (mat.Empty())
+            {
+                Console.WriteLine($"[ERROR] Failed to load template '{name}' from {filePath}");
+                return null;
+            }
+
+            try
+            {
+                // Если есть альфа-канал — убираем его
+                if (mat.Channels() == 4)
+                    Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2BGR);
+
+                // Приводим к серому, чтобы ускорить поиск
+                //Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
+
+                // Приводим к 8-битному типу, если нужно
+                if (mat.Type() != MatType.CV_8U)
+                    mat.ConvertTo(mat, MatType.CV_8U);
+
+                return mat;
+                Console.WriteLine($"[OK] Template '{name}' loaded ({filePath}), size={mat.Width}x{mat.Height}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EXCEPTION] Error processing template '{name}': {ex.Message}");
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -92,19 +147,38 @@ namespace tser
             foreach (var kvp in _templates)
             {
                 using var result = new Mat();
-                Cv2.MatchTemplate(screenMat, kvp.Value, result, TemplateMatchModes.CCoeffNormed);
-                Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out _);
+                Cv2.MatchTemplate(screenMat, kvp.Value, result, TemplateMatchModes.SqDiffNormed);
+                Cv2.MinMaxLoc(result, out _, out double minVal, out _, out _);
                 //Cv2.ImWrite("debug_region.png", screenMat);
                 //Cv2.ImWrite("debug_template.png", kvp.Value);
 
-                if (maxVal > bestScore)
+                if (minVal < bestScore || bestMatch == null)
                 {
-                    bestScore = maxVal;
+                    bestScore = minVal;
                     bestMatch = kvp.Key;
                 }
+
+                //if (maxVal > bestScore)
+                //{
+                //    bestScore = maxVal;
+                //    bestMatch = kvp.Key;
+                //}
             }
 
-            return bestScore >= _threshold ? bestMatch : null;
+            return bestScore <= 0.2 ? bestMatch : null;
+        }
+
+        public bool DetectCurrentWindow(Rectangle region, Mat mat)
+        {
+            using var screenMat = CaptureRegion(region);
+
+            using var result = new Mat();
+            Cv2.MatchTemplate(screenMat, mat, result, TemplateMatchModes.SqDiffNormed);
+            Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out _);
+            //Cv2.ImWrite("debug_region.png", screenMat);
+            //Cv2.ImWrite("debug_template.png", kvp.Value);
+
+            return maxVal <= 0.2 ? true: false;
         }
 
         /// <summary>
@@ -131,13 +205,13 @@ namespace tser
             var mat = BitmapConverter.ToMat(bmp);
 
             // Переводим в градации серого (BGR -> GRAY)
-            Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
+            //Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
 
             // Приводим к 8-битному типу
             if (mat.Type() != MatType.CV_8U)
                 mat.ConvertTo(mat, MatType.CV_8U);
 
-            //Cv2.ImWrite("debug_region.png", mat);
+            Cv2.ImWrite("debug_region.png", mat);
 
             // Возвращаем готовый Mat (копия, не зависящая от using)
             return mat;
@@ -186,7 +260,7 @@ namespace tser
 
         public int GetPrice(Rectangle region)
         {
-            var text = GetText(region);
+            var text = GetNumericText(region);
 
             string digitsOnly = new string(text.Where(c => char.IsDigit(c)).ToArray());
             Debug.WriteLine(digitsOnly); // Например, "12345"
@@ -196,7 +270,7 @@ namespace tser
             return number;
         }
 
-        public string GetText(Rectangle region)
+        public string GetNumericText(Rectangle region)
         {
             var row = CaptureRegion(region);
   
@@ -220,7 +294,99 @@ namespace tser
             //Cv2.ImWrite("processed3.png", processed);
 
             using var pix = MatToPix(row); // твой конвертер Mat -> Pix
-            using var page = ocr.Process(pix);
+            using var page = numericOcr.Process(pix);
+            string text = page.GetText();
+
+            return text;
+        }
+
+        public string GetText(Rectangle region)
+        {
+            var row = CaptureRegion(region);
+
+            // Увеличиваем изображение для OCR
+            //Mat resized = new Mat();
+            //Cv2.Resize(row, resized, new OpenCvSharp.Size(row.Width * 2, row.Height * 2), 0, 0, InterpolationFlags.Linear);
+            //Cv2.ImWrite("resized.png", resized);
+
+            Mat processed = new Mat();
+            //Cv2.BitwiseNot(resized, processed); // если текст темный, фон светлый
+            //Cv2.GaussianBlur(processed, processed, new OpenCvSharp.Size(3, 3), 0); // убираем шум
+            //Cv2.ImWrite("processed1.png", processed);
+
+            // Адаптивная бинаризация (темный текст на светлом фоне)
+            //Cv2.AdaptiveThreshold(row, processed, 255, AdaptiveThresholdTypes.MeanC, ThresholdTypes.BinaryInv, 15, 5);
+            //Cv2.ImWrite("processed2.png", processed);
+
+            // Морфология для удаления шумов
+            //Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(2, 2));
+            //Cv2.MorphologyEx(processed, processed, MorphTypes.Close, kernel);
+            //Cv2.ImWrite("processed3.png", processed);
+
+            using var pix = MatToPix(row); // твой конвертер Mat -> Pix
+            using var page = textOcr.Process(pix);
+            string text = page.GetText();
+
+            return text;
+        }
+
+        public string GetTextWithBackground(Rectangle region)
+        {
+            var row = CaptureRegion(region);
+
+            // Увеличиваем изображение для OCR
+            //Mat resized = new Mat();
+            //Cv2.Resize(row, resized, new OpenCvSharp.Size(row.Width * 2, row.Height * 2), 0, 0, InterpolationFlags.Linear);
+            //Cv2.ImWrite("resized.png", resized);
+
+            Mat processed = new Mat();
+            //Cv2.BitwiseNot(resized, processed); // если текст темный, фон светлый
+            //Cv2.GaussianBlur(processed, processed, new OpenCvSharp.Size(3, 3), 0); // убираем шум
+            //Cv2.ImWrite("processed1.png", processed);
+
+            // Адаптивная бинаризация (темный текст на светлом фоне)
+            //Cv2.AdaptiveThreshold(row, processed, 255, AdaptiveThresholdTypes.MeanC, ThresholdTypes.BinaryInv, 15, 5);
+            //Cv2.ImWrite("processed2.png", processed);
+
+            // Морфология для удаления шумов
+            //Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(2, 2));
+            //Cv2.MorphologyEx(processed, processed, MorphTypes.Close, kernel);
+            //Cv2.ImWrite("processed3.png", processed);
+
+            // 1. blur
+            //Cv2.GaussianBlur(row, processed, new OpenCvSharp.Size(3, 3), 0);
+            //Cv2.ImWrite("processed1.png", processed);
+
+            // 2. выделение светлого текста
+            var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(9, 9));
+            Cv2.MorphologyEx(row, processed, MorphTypes.TopHat, kernel);
+            Cv2.ImWrite("processed2.png", processed);
+
+            // мягкий порог (ключевой момент — НЕ высокий)
+            //Cv2.Threshold(processed, processed, 120, 255, ThresholdTypes.Binary);
+            //Cv2.ImWrite("processed3.png", processed);
+
+            Cv2.Normalize(processed, processed, 0, 255, NormTypes.MinMax);
+
+            //var k = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(2, 1));
+            //Cv2.Erode(processed, processed, k);
+
+            // 3. бинаризация
+            //Cv2.Threshold(processed, processed, 180, 255, ThresholdTypes.Binary);
+            //Cv2.ImWrite("processed3.png", processed);
+            // 4. усиление
+            //var kernel2 = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(2, 2));
+            //Cv2.MorphologyEx(processed, processed, MorphTypes.Close, kernel2);
+            //Cv2.ImWrite("processed4.png", processed);
+            // 5. upscale
+            //Cv2.Resize(processed, processed, new OpenCvSharp.Size(), 2, 2, InterpolationFlags.Nearest);
+
+
+            // debug
+            Cv2.ImWrite("processed.png", processed);
+
+            using var pix = MatToPix(processed); // твой конвертер Mat -> Pix
+            using var page = textOcr.Process(pix);
             string text = page.GetText();
 
             return text;
@@ -234,7 +400,7 @@ namespace tser
 
         public void Dispose()
         {
-            ocr?.Dispose();
+            numericOcr?.Dispose();
         }
     }
 }

@@ -9,5 +9,7 @@ namespace tser
     internal class BattleSettings
     {
         public LootStrategy LootStrategy { get; set; }
+
+        public bool OpenLootWindow { get; set; }
     }
 }

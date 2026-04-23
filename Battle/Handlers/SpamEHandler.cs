@@ -18,7 +18,7 @@ namespace tser
             this.sim = sim;
         }
 
-        public Task Activate()
+        public Task Activate(HandlerContext context)
         {
             if (_cts != null && !_cts.IsCancellationRequested)
                 return Task.CompletedTask;
@@ -28,7 +28,7 @@ namespace tser
             return Task.CompletedTask;
         }
         
-        public Task Deactivate()
+        public Task Deactivate(HandlerContext context)
         {
             _cts?.Cancel();
             return Task.CompletedTask;

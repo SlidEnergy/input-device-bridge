@@ -220,7 +220,7 @@ namespace tser
             var name = form.Name.Trim();
 
             // путь
-            var dir = Path.Combine("templates", "ru", "wide");
+            var dir = Path.Combine("assets", "templates", "ru", "wide");
             Directory.CreateDirectory(dir);
 
             var path = Path.Combine(dir, name + ".png");

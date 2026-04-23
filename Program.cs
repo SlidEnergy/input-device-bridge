@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using tser;
+using tser.Battle.Maps;
 using tser.Screen;
 using tser.Screen.Screenshots;
 
@@ -25,6 +26,7 @@ namespace tser
             services.AddTransient<SpamQHandler>();
             services.AddTransient<SpamEHandler>();
             services.AddTransient<FastLootHandler>();
+            services.AddTransient<GateHelperHandler>();
 
             services.AddTransient<Select43Handler>();
             services.AddTransient<Select52Handler>();
@@ -39,14 +41,23 @@ namespace tser
             services.AddTransient<BuyHandler>();
 
             services.AddTransient<BuySellItemFullScreen>();
+            services.AddTransient<BuySellItemQualityScreen>();
+            services.AddTransient<MapScreen>();
+            services.AddTransient<LootPersonScreen>();
 
             services.AddTransient<MainForm>();
             services.AddTransient<RegionManagerForm>();
             services.AddTransient<AskNameForm>();
 
+            services.AddTransient<GateHelperForm>();
+
+            services.AddSingleton<MapsManager>();
+
+
             var provider = services.BuildServiceProvider();
 
             ApplicationConfiguration.Initialize();
+
             Application.Run(provider.GetRequiredService<MainForm>());
         }
     }

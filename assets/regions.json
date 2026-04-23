@@ -1,0 +1,1286 @@
+[
+  {
+    "Name": "buy",
+    "FilePath": "assets\\screens\\buy.png",
+    "Regions": [
+      {
+        "Name": "title",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 620,
+            "Y": 345
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 370,
+            "Height": 25
+          },
+          "X": 620,
+          "Y": 345,
+          "Width": 370,
+          "Height": 25,
+          "Left": 620,
+          "Top": 345,
+          "Right": 990,
+          "Bottom": 370,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "sell",
+    "FilePath": "assets\\screens\\sell.png",
+    "Regions": [
+      {
+        "Name": "title",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 620,
+            "Y": 345
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 370,
+            "Height": 25
+          },
+          "X": 620,
+          "Y": 345,
+          "Width": 370,
+          "Height": 25,
+          "Left": 620,
+          "Top": 345,
+          "Right": 990,
+          "Bottom": 370,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "orders",
+    "FilePath": "assets\\screens\\orders.png",
+    "Regions": [
+      {
+        "Name": "title",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 620,
+            "Y": 345
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 370,
+            "Height": 25
+          },
+          "X": 620,
+          "Y": 345,
+          "Width": 370,
+          "Height": 25,
+          "Left": 620,
+          "Top": 345,
+          "Right": 990,
+          "Bottom": 370,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "buy_sell_item_full",
+    "FilePath": "assets\\screens\\buy_sell_item_full.png",
+    "Regions": [
+      {
+        "Name": "sell",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 607,
+            "Y": 458
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 80,
+            "Height": 16
+          },
+          "X": 607,
+          "Y": 458,
+          "Width": 80,
+          "Height": 16,
+          "Left": 607,
+          "Top": 458,
+          "Right": 687,
+          "Bottom": 474,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "buy",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 607,
+            "Y": 482
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 69,
+            "Height": 15
+          },
+          "X": 607,
+          "Y": 482,
+          "Width": 69,
+          "Height": 15,
+          "Left": 607,
+          "Top": 482,
+          "Right": 676,
+          "Bottom": 497,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "order_sell",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 605,
+            "Y": 505
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 145,
+            "Height": 16
+          },
+          "X": 605,
+          "Y": 505,
+          "Width": 145,
+          "Height": 16,
+          "Left": 605,
+          "Top": 505,
+          "Right": 750,
+          "Bottom": 521,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "order_buy",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 607,
+            "Y": 530
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 138,
+            "Height": 12
+          },
+          "X": 607,
+          "Y": 530,
+          "Width": 138,
+          "Height": 12,
+          "Left": 607,
+          "Top": 530,
+          "Right": 745,
+          "Bottom": 542,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "decrease_count",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 607,
+            "Y": 581
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 10,
+            "Height": 11
+          },
+          "X": 607,
+          "Y": 581,
+          "Width": 10,
+          "Height": 11,
+          "Left": 607,
+          "Top": 581,
+          "Right": 617,
+          "Bottom": 592,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "increase_count",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 873,
+            "Y": 583
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 8,
+            "Height": 8
+          },
+          "X": 873,
+          "Y": 583,
+          "Width": 8,
+          "Height": 8,
+          "Left": 873,
+          "Top": 583,
+          "Right": 881,
+          "Bottom": 591,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "decrease_price",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 607,
+            "Y": 610
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 15,
+            "Height": 15
+          },
+          "X": 607,
+          "Y": 610,
+          "Width": 15,
+          "Height": 15,
+          "Left": 607,
+          "Top": 610,
+          "Right": 622,
+          "Bottom": 625,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "increase_price",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 865,
+            "Y": 608
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 15,
+            "Height": 16
+          },
+          "X": 865,
+          "Y": 608,
+          "Width": 15,
+          "Height": 16,
+          "Left": 865,
+          "Top": 608,
+          "Right": 880,
+          "Bottom": 624,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "ok",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 854,
+            "Y": 694
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 78,
+            "Height": 22
+          },
+          "X": 854,
+          "Y": 694,
+          "Width": 78,
+          "Height": 22,
+          "Left": 854,
+          "Top": 694,
+          "Right": 932,
+          "Bottom": 716,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "close",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 931,
+            "Y": 327
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 17,
+            "Height": 17
+          },
+          "X": 931,
+          "Y": 327,
+          "Width": 17,
+          "Height": 17,
+          "Left": 931,
+          "Top": 327,
+          "Right": 948,
+          "Bottom": 344,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "price_input",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 650,
+            "Y": 612
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 85,
+            "Height": 14
+          },
+          "X": 650,
+          "Y": 612,
+          "Width": 85,
+          "Height": 14,
+          "Left": 650,
+          "Top": 612,
+          "Right": 735,
+          "Bottom": 626,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "buy_list",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 1223,
+            "Y": 386
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 150,
+            "Height": 132
+          },
+          "X": 1223,
+          "Y": 386,
+          "Width": 150,
+          "Height": 132,
+          "Left": 1223,
+          "Top": 386,
+          "Right": 1373,
+          "Bottom": 518,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "sell_list",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 1012,
+            "Y": 386
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 150,
+            "Height": 132
+          },
+          "X": 1012,
+          "Y": 386,
+          "Width": 150,
+          "Height": 132,
+          "Left": 1012,
+          "Top": 386,
+          "Right": 1162,
+          "Bottom": 518,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "best_buy_price",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 1223,
+            "Y": 386
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 70,
+            "Height": 17
+          },
+          "X": 1223,
+          "Y": 386,
+          "Width": 70,
+          "Height": 17,
+          "Left": 1223,
+          "Top": 386,
+          "Right": 1293,
+          "Bottom": 403,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "best_sell_price",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 1012,
+            "Y": 386
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 70,
+            "Height": 17
+          },
+          "X": 1012,
+          "Y": 386,
+          "Width": 70,
+          "Height": 17,
+          "Left": 1012,
+          "Top": 386,
+          "Right": 1082,
+          "Bottom": 403,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "suits",
+    "FilePath": "assets\\screens\\suits.png",
+    "Regions": [
+      {
+        "Name": "title",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 620,
+            "Y": 345
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 370,
+            "Height": 25
+          },
+          "X": 620,
+          "Y": 345,
+          "Width": 370,
+          "Height": 25,
+          "Left": 620,
+          "Top": 345,
+          "Right": 990,
+          "Bottom": 370,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "create_buy_orders",
+    "FilePath": "assets\\screens\\create_buy_orders.png",
+    "Regions": [
+      {
+        "Name": "title",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 620,
+            "Y": 345
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 370,
+            "Height": 25
+          },
+          "X": 620,
+          "Y": 345,
+          "Width": 370,
+          "Height": 25,
+          "Left": 620,
+          "Top": 345,
+          "Right": 990,
+          "Bottom": 370,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "buy_sell_item_quality",
+    "FilePath": "assets\\screens\\buy_sell_item_quality.png",
+    "Regions": [
+      {
+        "Name": "Normal",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 792,
+            "Y": 428
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 95,
+            "Height": 21
+          },
+          "X": 792,
+          "Y": 428,
+          "Width": 95,
+          "Height": 21,
+          "Left": 792,
+          "Top": 428,
+          "Right": 887,
+          "Bottom": 449,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "Good",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 449
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 96,
+            "Height": 21
+          },
+          "X": 791,
+          "Y": 449,
+          "Width": 96,
+          "Height": 21,
+          "Left": 791,
+          "Top": 449,
+          "Right": 887,
+          "Bottom": 470,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "Outstanding",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 473
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 94,
+            "Height": 20
+          },
+          "X": 791,
+          "Y": 473,
+          "Width": 94,
+          "Height": 20,
+          "Left": 791,
+          "Top": 473,
+          "Right": 885,
+          "Bottom": 493,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "Excelent",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 497
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 92,
+            "Height": 21
+          },
+          "X": 791,
+          "Y": 497,
+          "Width": 92,
+          "Height": 21,
+          "Left": 791,
+          "Top": 497,
+          "Right": 883,
+          "Bottom": 518,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "Masterpiece",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 792,
+            "Y": 523
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 89,
+            "Height": 19
+          },
+          "X": 792,
+          "Y": 523,
+          "Width": 89,
+          "Height": 19,
+          "Left": 792,
+          "Top": 523,
+          "Right": 881,
+          "Bottom": 542,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "select",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 409
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 82,
+            "Height": 12
+          },
+          "X": 791,
+          "Y": 409,
+          "Width": 82,
+          "Height": 12,
+          "Left": 791,
+          "Top": 409,
+          "Right": 873,
+          "Bottom": 421,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "1",
+    "FilePath": "assets\\screens\\1.png",
+    "Regions": [
+      {
+        "Name": "q",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 409
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 82,
+            "Height": 12
+          },
+          "X": 791,
+          "Y": 409,
+          "Width": 82,
+          "Height": 12,
+          "Left": 791,
+          "Top": 409,
+          "Right": 873,
+          "Bottom": 421,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "2",
+    "FilePath": "assets\\screens\\2.png",
+    "Regions": [
+      {
+        "Name": "q",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 409
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 82,
+            "Height": 12
+          },
+          "X": 791,
+          "Y": 409,
+          "Width": 82,
+          "Height": 12,
+          "Left": 791,
+          "Top": 409,
+          "Right": 873,
+          "Bottom": 421,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "3",
+    "FilePath": "assets\\screens\\3.png",
+    "Regions": [
+      {
+        "Name": "q",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 409
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 82,
+            "Height": 12
+          },
+          "X": 791,
+          "Y": 409,
+          "Width": 82,
+          "Height": 12,
+          "Left": 791,
+          "Top": 409,
+          "Right": 873,
+          "Bottom": 421,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "4",
+    "FilePath": "assets\\screens\\4.png",
+    "Regions": [
+      {
+        "Name": "q",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 409
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 82,
+            "Height": 12
+          },
+          "X": 791,
+          "Y": 409,
+          "Width": 82,
+          "Height": 12,
+          "Left": 791,
+          "Top": 409,
+          "Right": 873,
+          "Bottom": 421,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "5",
+    "FilePath": "assets\\screens\\5.png",
+    "Regions": [
+      {
+        "Name": "q",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 791,
+            "Y": 409
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 82,
+            "Height": 12
+          },
+          "X": 791,
+          "Y": 409,
+          "Width": 82,
+          "Height": 12,
+          "Left": 791,
+          "Top": 409,
+          "Right": 873,
+          "Bottom": 421,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "loot_person",
+    "FilePath": "assets\\screens\\loot_person.png",
+    "Regions": [
+      {
+        "Name": "l1",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 814,
+            "Y": 400
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 56,
+            "Height": 55
+          },
+          "X": 814,
+          "Y": 400,
+          "Width": 56,
+          "Height": 55,
+          "Left": 814,
+          "Top": 400,
+          "Right": 870,
+          "Bottom": 455,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "l2",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 884,
+            "Y": 400
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 57,
+            "Height": 55
+          },
+          "X": 884,
+          "Y": 400,
+          "Width": 57,
+          "Height": 55,
+          "Left": 884,
+          "Top": 400,
+          "Right": 941,
+          "Bottom": 455,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "l3",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 954,
+            "Y": 402
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 56,
+            "Height": 52
+          },
+          "X": 954,
+          "Y": 402,
+          "Width": 56,
+          "Height": 52,
+          "Left": 954,
+          "Top": 402,
+          "Right": 1010,
+          "Bottom": 454,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "l4",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 1023,
+            "Y": 400
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 60,
+            "Height": 54
+          },
+          "X": 1023,
+          "Y": 400,
+          "Width": 60,
+          "Height": 54,
+          "Left": 1023,
+          "Top": 400,
+          "Right": 1083,
+          "Bottom": 454,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "l5",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 814,
+            "Y": 471
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 54,
+            "Height": 52
+          },
+          "X": 814,
+          "Y": 471,
+          "Width": 54,
+          "Height": 52,
+          "Left": 814,
+          "Top": 471,
+          "Right": 868,
+          "Bottom": 523,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "l6",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 884,
+            "Y": 471
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 57,
+            "Height": 53
+          },
+          "X": 884,
+          "Y": 471,
+          "Width": 57,
+          "Height": 53,
+          "Left": 884,
+          "Top": 471,
+          "Right": 941,
+          "Bottom": 524,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "empty",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 953,
+            "Y": 468
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 953,
+          "Y": 468,
+          "Width": 62,
+          "Height": 62,
+          "Left": 953,
+          "Top": 468,
+          "Right": 1015,
+          "Bottom": 530,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "broken4",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 952,
+            "Y": 397
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 952,
+          "Y": 397,
+          "Width": 62,
+          "Height": 62,
+          "Left": 952,
+          "Top": 397,
+          "Right": 1014,
+          "Bottom": 459,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "take_all",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 1037,
+            "Y": 742
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 55,
+            "Height": 14
+          },
+          "X": 1037,
+          "Y": 742,
+          "Width": 55,
+          "Height": 14,
+          "Left": 1037,
+          "Top": 742,
+          "Right": 1092,
+          "Bottom": 756,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "empty2",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 952,
+            "Y": 541
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 952,
+          "Y": 541,
+          "Width": 62,
+          "Height": 62,
+          "Left": 952,
+          "Top": 541,
+          "Right": 1014,
+          "Bottom": 603,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "title",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 879,
+            "Y": 314
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 90,
+            "Height": 17
+          },
+          "X": 879,
+          "Y": 314,
+          "Width": 90,
+          "Height": 17,
+          "Left": 879,
+          "Top": 314,
+          "Right": 969,
+          "Bottom": 331,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "loot_person2",
+    "FilePath": "assets\\screens\\loot_person2.png",
+    "Regions": [
+      {
+        "Name": "3",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 952,
+            "Y": 397
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 952,
+          "Y": 397,
+          "Width": 62,
+          "Height": 62,
+          "Left": 952,
+          "Top": 397,
+          "Right": 1014,
+          "Bottom": 459,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "5",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 881,
+            "Y": 467
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 881,
+          "Y": 467,
+          "Width": 62,
+          "Height": 62,
+          "Left": 881,
+          "Top": 467,
+          "Right": 943,
+          "Bottom": 529,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "loot_person3",
+    "FilePath": "assets\\screens\\loot_person3.png",
+    "Regions": [
+      {
+        "Name": "broken7",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 881,
+            "Y": 467
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 881,
+          "Y": 467,
+          "Width": 62,
+          "Height": 62,
+          "Left": 881,
+          "Top": 467,
+          "Right": 943,
+          "Bottom": 529,
+          "IsEmpty": false
+        }
+      },
+      {
+        "Name": "broken2",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 881,
+            "Y": 397
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 881,
+          "Y": 397,
+          "Width": 62,
+          "Height": 62,
+          "Left": 881,
+          "Top": 397,
+          "Right": 943,
+          "Bottom": 459,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "loot_person4",
+    "FilePath": "assets\\screens\\loot_person4.png",
+    "Regions": [
+      {
+        "Name": "loot_broken6",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 811,
+            "Y": 397
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 811,
+          "Y": 397,
+          "Width": 62,
+          "Height": 62,
+          "Left": 811,
+          "Top": 397,
+          "Right": 873,
+          "Bottom": 459,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "loot_person5",
+    "FilePath": "assets\\screens\\loot_person5.png",
+    "Regions": [
+      {
+        "Name": "loot_broken8",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 811,
+            "Y": 397
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 811,
+          "Y": 397,
+          "Width": 62,
+          "Height": 62,
+          "Left": 811,
+          "Top": 397,
+          "Right": 873,
+          "Bottom": 459,
+          "IsEmpty": false
+        }
+      }
+    ]
+  },
+  {
+    "Name": "loot_person6",
+    "FilePath": "assets\\screens\\loot_person6.png",
+    "Regions": [
+      {
+        "Name": "loot_broken1",
+        "Rect": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 811,
+            "Y": 397
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 62,
+            "Height": 62
+          },
+          "X": 811,
+          "Y": 397,
+          "Width": 62,
+          "Height": 62,
+          "Left": 811,
+          "Top": 397,
+          "Right": 873,
+          "Bottom": 459,
+          "IsEmpty": false
+        }
+      }
+    ]
+  }
+]

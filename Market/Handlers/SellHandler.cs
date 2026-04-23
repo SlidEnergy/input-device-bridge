@@ -20,7 +20,7 @@
             okRect = regionManager.GetRect("buy_sell_item_full", "ok");
         }
 
-        public async Task Run()
+        public async Task Run(HandlerContext context)
         {
             var from = Cursor.Position;
 

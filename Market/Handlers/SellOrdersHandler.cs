@@ -19,7 +19,7 @@ namespace tser
             _analyzer = screenAnalyzer;
         }
 
-        public async Task Run()
+        public async Task Run(HandlerContext context)
         {
             var priceTyper = new PriceTyper(sim);
 

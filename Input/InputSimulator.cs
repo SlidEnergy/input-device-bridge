@@ -114,6 +114,20 @@ namespace tser
             _serialPort.WriteLine("VKEY " + (int)key);
         }
 
+        public void ShiftDown(Keys key)
+        {
+            //OpenSerialPort();
+
+            _serialPort.WriteLine("SHIFTDOWN");
+        }
+
+        public void ShiftUp(Keys key)
+        {
+            //OpenSerialPort();
+
+            _serialPort.WriteLine("SHIFTUP");
+        }
+
         public void SendCommand(string command, params string[] args)
         {
             //OpenSerialPort();

@@ -14,7 +14,7 @@ namespace tser
 
         Dictionary<string, Screenshot> data = new();
 
-        private string filePath = "data.json";
+        private string filePath = "assets/regions.json";
 
         public void InitRegions()
         {
@@ -61,9 +61,9 @@ namespace tser
 
         public void AddScreenshot(string name, Image image)
         {
-            string path = Path.Combine("screens", name + ".png");
+            string path = Path.Combine("assets", "screens", name + ".png");
 
-            Directory.CreateDirectory("screens");
+            Directory.CreateDirectory("assets/screens");
             image.Save(path);
 
             data[name] = new Screenshot

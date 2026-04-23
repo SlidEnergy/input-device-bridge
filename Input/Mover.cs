@@ -222,8 +222,8 @@ namespace tser
 
             double distance = Math.Sqrt(dx * dx + dy * dy);
 
-            int duration = Math.Clamp((int)(distance * 1.2), 12, 90);
-            int steps = Math.Clamp(duration / 5, 4, 25);
+            int duration = Math.Clamp((int)(distance * 1.0), 10, 30);
+            int steps = Math.Clamp(duration / 5, 4, 20);
 
             double accX = 0;
             double accY = 0;
@@ -315,7 +315,7 @@ namespace tser
             MoveSmooth(toX, toY);
             //await Task.Delay(100);
             _sim.LeftButtonClick();
-            await Task.Delay(100);
+            await Task.Delay(50);
         }
 
         public async Task MoveAndClick(int x1, int y1, int x2, int y2)

@@ -32,17 +32,18 @@ namespace tser
             analyzer = _serviceProvider.GetRequiredService<ScreenAnalyzer>();
 
             // Добавляем шаблоны
-            analyzer.AddTemplate("main_buy", "templates/ru/wide/main_buy.png");
-            analyzer.AddTemplate("main_sell", "templates/ru/wide/main_sell.png");
-            analyzer.AddTemplate("main_create_buy_order", "templates/ru/wide/main_create_buy_order.png");
-            analyzer.AddTemplate("main_orders", "templates/ru/wide/main_orders.png");
-            analyzer.AddTemplate("main_suits", "templates/ru/wide/main_suits.png");
+            analyzer.ClearTemplates();
+            analyzer.AddTemplate("main_buy", "assets/templates/ru/wide/main_buy.png");
+            analyzer.AddTemplate("main_sell", "assets/templates/ru/wide/main_sell.png");
+            analyzer.AddTemplate("main_create_buy_order", "assets/templates/ru/wide/main_create_buy_order.png");
+            analyzer.AddTemplate("main_orders", "assets/templates/ru/wide/main_orders.png");
+            analyzer.AddTemplate("main_suits", "assets/templates/ru/wide/main_suits.png");
 
             _regionManager = _serviceProvider.GetRequiredService<RegionManager>();
             _mainTextRegion = _regionManager.GetRect("buy", "title");
         }
 
-        public async Task Run()
+        public async Task Run(HandlerContext context)
         { 
             var detected = analyzer.DetectCurrentWindow(_mainTextRegion);
 
@@ -53,21 +54,21 @@ namespace tser
                     break;
 
                 case "main_sell":
-                    await _sellHandler.Run();
+                    await _sellHandler.Run(context);
                     break;
 
                 case "main_orders":
                     {
                         var from = Cursor.Position;
                         if(from.Y >= 600)
-                            await _sellOrdersHandler.Run();
+                            await _sellOrdersHandler.Run(context);
                         else
-                            await _buyOrdersHandler.Run();
+                            await _buyOrdersHandler.Run(context);
                         break;
                     }
 
                 default:
-                    await _buyHandler.Run();
+                    await _buyHandler.Run(context);
                     break;
             }
         }

@@ -15,7 +15,7 @@
             mover = new Mover(sim);
         }
 
-        public async Task Run()
+        public async Task Run(HandlerContext context)
         { 
             var bestBuyPrice = _analyzer.GetPrice(_bestBuyPriceRegion);
             var bestSellPrice = _analyzer.GetPrice(_bestSellPriceRegion);

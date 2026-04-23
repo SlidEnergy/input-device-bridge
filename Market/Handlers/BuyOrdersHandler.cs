@@ -24,7 +24,7 @@ namespace tser
             mover = new Mover(sim);
         }
 
-        public async Task Run()
+        public async Task Run(HandlerContext context)
         {
             var priceTyper = new PriceTyper(sim);
 
