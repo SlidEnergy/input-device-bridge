@@ -5,6 +5,9 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Forms;
 using System.Text.Json;
 using tser.Battle.Maps;
+using System.Management;
+using System.IO.Ports;
+using OpenCvSharp.ML;
 
 namespace tser
 {
@@ -23,6 +26,7 @@ namespace tser
         private Select62Handler handler62;
         private SpamQHandler _spamQHandler;
         private SpamEHandler _spamEHandler;
+        private LowHpPlayerHandler _lowHpPlayerHelperHandler;
 
         private Kmh _kmh;
         private AppSettings _settings;
@@ -50,7 +54,10 @@ namespace tser
             _settings = provider.GetRequiredService<AppSettings>();
             _mapManager = provider.GetRequiredService<MapsManager>();
 
-            _kmh = new Kmh(true);
+            // Отключаем лаги при отладке
+            var autohook = true;// !System.Diagnostics.Debugger.IsAttached;
+
+            _kmh = new Kmh(autohook);
             _kmh.KeyDown += _kmh_KeyDown;
             _kmh.MouseDown += _kmh_MouseDown;
             _kmh.MouseUp += _kmh_MouseUp;
@@ -63,26 +70,53 @@ namespace tser
             handler62 = _serviceProvider.GetRequiredService<Select62Handler>();
             _spamQHandler = _serviceProvider.GetRequiredService<SpamQHandler>();
             _spamEHandler = _serviceProvider.GetRequiredService<SpamEHandler>();
+            _lowHpPlayerHelperHandler = _serviceProvider.GetRequiredService<LowHpPlayerHandler>();
 
             _settings.TradingSettings.AllowedBestPriceOrderPosition = (int)allowedBestPriceOrderPositionNumericUpDown.Value;
             _settings.BattleSettings.LootStrategy = bestLootStrategyRadioButton.Checked ? LootStrategy.Best : LootStrategy.All;
             _settings.BattleSettings.OpenLootWindow = openLootWindowCheckBox.Checked;
+            _settings.TradingSettings.FastBuy = fastBuyCheckBox.Checked;
+        }
 
+        ManagementEventWatcher watcher;
 
-            //_serialReader = new SerialDebugReader("COM4", 115200);
+        private void StartWatching()
+        {
+            watcher = new ManagementEventWatcher(
+                new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent")
+            );
 
-            //_serialReader.LineReceived += line =>
-            //{
-            //    Debug.WriteLine(line);
-            //};
+            watcher.EventArrived += (s, e) =>
+            {
+                // Важно: событие не в UI-потоке
+                BeginInvoke(new Action(UpdatePorts));
+            };
 
-            //_serialReader.Start();
+            watcher.Start();
+        }
 
+        private void StopWatching()
+        {
+            watcher?.Stop();
+            watcher?.Dispose();
+        }
+
+        private void UpdatePorts()
+        {
+            string selected = comPortsComboBox.SelectedItem as string;
+
+            comPortsComboBox.Items.Clear();
+            comPortsComboBox.Items.AddRange(SerialPort.GetPortNames());
+
+            if (selected != null && comPortsComboBox.Items.Contains(selected))
+                comPortsComboBox.SelectedItem = selected;
+            else if (comPortsComboBox.Items.Count > 0)
+                comPortsComboBox.SelectedIndex = 0;
         }
 
         private async void Form1_Shown(object sender, EventArgs e)
         {
-            _ = MonitorPortAsync();
+
         }
 
         private CancellationTokenSource _cts = new();
@@ -230,16 +264,10 @@ namespace tser
                     {
                         //const int VK_CONTROL = 0x11;
                         //bool ctrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
-                        var handler = _serviceProvider.GetRequiredService<MainActionHandler>();
+                        var handler = _serviceProvider.GetRequiredService<MarketActionHandler>();
                         RunAsync(handler.Run);
 
                         return true; // событие обработано
-                    }
-                    else if (newBuyOrderRadioButton.Checked)
-                    {
-                        var handler = _serviceProvider.GetRequiredService<NewBuyOrderHandler>();
-                        RunAsync(handler.Run);
-                        return true;
                     }
                     else if (spamQRadioButton.Checked && spamActivated == false)
                     {
@@ -263,6 +291,12 @@ namespace tser
                     {
                         var handler = _serviceProvider.GetRequiredService<GateHelperHandler>();
                         RunAsync(handler.Run);
+
+                        return true;
+                    }
+                    else if (lowHpPlayerHelperRadioButton.Checked && lowHpPlayerHelperActivated)
+                    {
+                        RunAsync(_lowHpPlayerHelperHandler.Run);
 
                         return true;
                     }
@@ -365,26 +399,18 @@ namespace tser
         {
             RunAsync(async (HandlerContext context) =>
             {
-                var cursor = Cursor.Position;
+                //var cursor = Cursor.Position;
 
-                context.SynchronizationContext.Post(_ =>
-                {
-                    var form = new GateHelperForm();
-                    form.StartPosition = FormStartPosition.Manual;
-                    form.Location = new Point(cursor.X + 20, cursor.Y + 20);
-                    form.SetText("test text title");
-                    form.Show();
-                    form.InitAutoClose(Cursor.Position);
-                }, null);
+                //context.SynchronizationContext.Post(_ =>
+                //{
+                //    var form = new GateHelperForm(_mapManager);
+                //    form.StartPosition = FormStartPosition.Manual;
+                //    form.Location = new Point(cursor.X + 20, cursor.Y + 20);
+                //    form.SetText("test text title");
+                //    form.Show();
+                //    form.InitAutoClose(Cursor.Position);
+                //}, null);
             });
-        }
-
-        private void calibrateButton_Click(object sender, EventArgs e)
-        {
-            MouseCalibration calibration = new MouseCalibration(inputSimulator);
-            var result = calibration.Calibrate();
-            MainForm.ScaleX = result.scaleX;
-            MainForm.ScaleY = result.scaleY;
         }
 
         private void lootAllCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -407,6 +433,7 @@ namespace tser
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            UpdatePorts();
             _regionManager.InitRegions();
 
             var analyzer = _serviceProvider.GetRequiredService<ScreenAnalyzer>();
@@ -421,6 +448,41 @@ namespace tser
         private void openLootWindowCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             _settings.BattleSettings.OpenLootWindow = openLootWindowCheckBox.Checked;
+        }
+
+        private void fastBuyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            _settings.TradingSettings.FastBuy = fastBuyCheckBox.Checked;
+        }
+
+        private async void connectButton_Click(object sender, EventArgs e)
+        {
+            inputSimulator.InitComPort((string)comPortsComboBox.SelectedItem);
+            _ = MonitorPortAsync();
+        }
+
+        private void setGroupPanelPositionButton_Click(object sender, EventArgs e)
+        {
+            _settings.BattleSettings.GroupPanelPosition = new Point(610, 554);
+        }
+
+        private bool lowHpPlayerHelperActivated = false;
+
+        private void lowHpPlayerHelperRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lowHpPlayerHelperRadioButton.Checked && lowHpPlayerHelperActivated == false)
+            {
+                lowHpPlayerHelperActivated = true;
+                RunAsync(_lowHpPlayerHelperHandler.Activate);
+                return;
+            }
+            
+            if (!lowHpPlayerHelperRadioButton.Checked && lowHpPlayerHelperActivated == true)
+            {
+                lowHpPlayerHelperActivated = false;
+                RunAsync(_lowHpPlayerHelperHandler.Deactivate);
+                return;
+            }
         }
     }
 }

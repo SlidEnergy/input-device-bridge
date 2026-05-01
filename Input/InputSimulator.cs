@@ -17,7 +17,13 @@ namespace tser
 
         public InputSimulator()
         {
-            _serialPort = new SerialPort("COM5", 115200)
+
+
+        }
+
+        public void InitComPort(string comPort)
+        {
+            _serialPort = new SerialPort(comPort, 115200)
             {
                 DataBits = 8,
                 Parity = Parity.None,
@@ -31,7 +37,6 @@ namespace tser
             _serialPort.RtsEnable = false;
 
             _serialPort.DataReceived += OnDataReceived;
-
         }
 
         private readonly StringBuilder _buffer = new StringBuilder();

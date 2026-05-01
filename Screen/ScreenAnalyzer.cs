@@ -13,18 +13,19 @@ using Tesseract;
 
 namespace tser
 {
-    public class ScreenAnalyzer: IDisposable
+    internal class ScreenAnalyzer: IDisposable
     {
-        private readonly Dictionary<string, Mat> _templates = new();
         private readonly double _threshold;
         private const int SELECT_LIST_TOTAL_LINES_ON_SCREEN = 6;
         private TesseractEngine numericOcr;
         private TesseractEngine textOcr;
+        private TemplateManager _templateManager;
 
-        public ScreenAnalyzer()
+        public ScreenAnalyzer(TemplateManager templateManager)
         {
             double threshold = 0.2;
             _threshold = threshold;
+            _templateManager = templateManager;
         }
 
         public void Init()
@@ -41,110 +42,27 @@ namespace tser
             textOcr.DefaultPageSegMode = PageSegMode.SingleLine;
         }
 
-        /// <summary>
-        /// Добавляет шаблон для поиска.
-        /// </summary>
-        //public void AddTemplate(string name, string filePath)
-        //{
-        //    var mat = Cv2.ImRead(filePath, ImreadModes.Color);
-        //    _templates[name] = mat;
-        //}
-
-        public void ClearTemplates()
+        public string? DetectCurrentWindow(Rectangle region, string source)
         {
-            _templates.Clear();
-        }
+            var templates = _templateManager.GetTemplates(source);
 
-        public void AddTemplate(string name, string filePath)
-        {
-            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
-            {
-                Console.WriteLine($"[WARN] Template file not found: {filePath}");
-                return;
-            }
-
-            //var mat = Cv2.ImRead(filePath, ImreadModes.Unchanged);
-            var mat = Cv2.ImRead(filePath, ImreadModes.Color);
-
-            if (mat.Empty())
-            {
-                Console.WriteLine($"[ERROR] Failed to load template '{name}' from {filePath}");
-                return;
-            }
-
-            try
-            {
-                // Если есть альфа-канал — убираем его
-                if (mat.Channels() == 4)
-                    Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2BGR);
-
-                // Приводим к серому, чтобы ускорить поиск
-                //Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
-
-                // Приводим к 8-битному типу, если нужно
-                if (mat.Type() != MatType.CV_8U)
-                    mat.ConvertTo(mat, MatType.CV_8U);
-
-                _templates[name] = mat;
-                Console.WriteLine($"[OK] Template '{name}' loaded ({filePath}), size={mat.Width}x{mat.Height}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[EXCEPTION] Error processing template '{name}': {ex.Message}");
-            }
-        }
-
-        public Mat CreateTemplate(string name, string filePath)
-        {
-            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
-            {
-                Console.WriteLine($"[WARN] Template file not found: {filePath}");
+            if (templates == null)
                 return null;
-            }
 
-            var mat = Cv2.ImRead(filePath, ImreadModes.Unchanged);
-
-            if (mat.Empty())
-            {
-                Console.WriteLine($"[ERROR] Failed to load template '{name}' from {filePath}");
-                return null;
-            }
-
-            try
-            {
-                // Если есть альфа-канал — убираем его
-                if (mat.Channels() == 4)
-                    Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2BGR);
-
-                // Приводим к серому, чтобы ускорить поиск
-                //Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
-
-                // Приводим к 8-битному типу, если нужно
-                if (mat.Type() != MatType.CV_8U)
-                    mat.ConvertTo(mat, MatType.CV_8U);
-
-                return mat;
-                Console.WriteLine($"[OK] Template '{name}' loaded ({filePath}), size={mat.Width}x{mat.Height}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[EXCEPTION] Error processing template '{name}': {ex.Message}");
-            }
-
-            return null;
+            return DetectCurrentWindow(region, templates);
         }
 
         /// <summary>
         /// Делает снимок заданной области экрана и определяет, какой шаблон найден.
         /// </summary>
-        public string? DetectCurrentWindow(Rectangle region)
+        public string? DetectCurrentWindow(Rectangle region, Dictionary<string, Mat> templates)
         {
             using var screenMat = CaptureRegion(region);
 
             string? bestMatch = null;
             double bestScore = 0;
 
-            foreach (var kvp in _templates)
+            foreach (var kvp in templates)
             {
                 using var result = new Mat();
                 Cv2.MatchTemplate(screenMat, kvp.Value, result, TemplateMatchModes.SqDiffNormed);
@@ -168,19 +86,6 @@ namespace tser
             return bestScore <= 0.2 ? bestMatch : null;
         }
 
-        public bool DetectCurrentWindow(Rectangle region, Mat mat)
-        {
-            using var screenMat = CaptureRegion(region);
-
-            using var result = new Mat();
-            Cv2.MatchTemplate(screenMat, mat, result, TemplateMatchModes.SqDiffNormed);
-            Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out _);
-            //Cv2.ImWrite("debug_region.png", screenMat);
-            //Cv2.ImWrite("debug_template.png", kvp.Value);
-
-            return maxVal <= 0.2 ? true: false;
-        }
-
         /// <summary>
         /// Снимает изображение с экрана в виде Mat только в заданном прямоугольнике.
         /// </summary>
@@ -192,7 +97,7 @@ namespace tser
         //    return BitmapConverter.ToMat(bmp);
         //}
 
-        private static Mat CaptureRegion(Rectangle region)
+        public Mat CaptureRegion(Rectangle region)
         {
             // Создаем bitmap нужного размера
             using var bmp = new Bitmap(region.Width, region.Height, PixelFormat.Format24bppRgb);
@@ -222,13 +127,16 @@ namespace tser
             // 1. Захватываем регион и конвертируем в серый
             using var listboxMat = CaptureRegion(region); // твоя CaptureRegion уже возвращает GRAY 8U
 
+            using var gray = new Mat();
+            Cv2.CvtColor(listboxMat, gray, ColorConversionCodes.BGR2GRAY);
+
             // 2. Маска для яркого зеленого фона (диапазон подбирается под твой цвет)
             using var mask = new Mat();
             // Так как CaptureRegion уже в GRAY, используем диапазон яркости
             if(isGraySelection)
-                Cv2.InRange(listboxMat, new Scalar(50), new Scalar(160), mask);
+                Cv2.InRange(gray, new Scalar(50), new Scalar(160), mask);
             else
-                Cv2.InRange(listboxMat, new Scalar(90), new Scalar(140), mask);
+                Cv2.InRange(gray, new Scalar(90), new Scalar(140), mask);
 
             //Cv2.ImWrite(@"mask_debug.png", mask);
 
@@ -304,6 +212,9 @@ namespace tser
         {
             var row = CaptureRegion(region);
 
+            using var gray = new Mat();
+            Cv2.CvtColor(row, gray, ColorConversionCodes.BGR2GRAY);
+
             // Увеличиваем изображение для OCR
             //Mat resized = new Mat();
             //Cv2.Resize(row, resized, new OpenCvSharp.Size(row.Width * 2, row.Height * 2), 0, 0, InterpolationFlags.Linear);
@@ -323,7 +234,7 @@ namespace tser
             //Cv2.MorphologyEx(processed, processed, MorphTypes.Close, kernel);
             //Cv2.ImWrite("processed3.png", processed);
 
-            using var pix = MatToPix(row); // твой конвертер Mat -> Pix
+            using var pix = MatToPix(gray); // твой конвертер Mat -> Pix
             using var page = textOcr.Process(pix);
             string text = page.GetText();
 
@@ -333,6 +244,9 @@ namespace tser
         public string GetTextWithBackground(Rectangle region)
         {
             var row = CaptureRegion(region);
+
+            using var gray = new Mat();
+            Cv2.CvtColor(row, gray, ColorConversionCodes.BGR2GRAY);
 
             // Увеличиваем изображение для OCR
             //Mat resized = new Mat();
@@ -359,7 +273,7 @@ namespace tser
 
             // 2. выделение светлого текста
             var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(9, 9));
-            Cv2.MorphologyEx(row, processed, MorphTypes.TopHat, kernel);
+            Cv2.MorphologyEx(gray, processed, MorphTypes.TopHat, kernel);
             Cv2.ImWrite("processed2.png", processed);
 
             // мягкий порог (ключевой момент — НЕ высокий)

@@ -315,7 +315,7 @@ namespace tser
             MoveSmooth(toX, toY);
             //await Task.Delay(100);
             _sim.LeftButtonClick();
-            await Task.Delay(50);
+            await Task.Delay(100);
         }
 
         public async Task MoveAndClick(int x1, int y1, int x2, int y2)

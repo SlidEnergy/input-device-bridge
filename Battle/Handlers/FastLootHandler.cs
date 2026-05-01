@@ -10,23 +10,10 @@ namespace tser
         private Mover mover;
         private ScreenAnalyzer _analyzer;
         private readonly LootPersonScreen screen;
-        private Mat lootTitle;
 
         public FastLootHandler(InputSimulator inputSimulator, AppSettings appSettings, ScreenAnalyzer screenAnalyzer, LootPersonScreen screen)
         {
             _analyzer = screenAnalyzer;
-            _analyzer.ClearTemplates();
-            lootTitle = _analyzer.CreateTemplate("LootTitle", "assets/templates/ru/wide/loot_title.png");
-            _analyzer.AddTemplate("Empty1", "assets/templates/ru/wide/loot_empty1.png");
-            _analyzer.AddTemplate("Empty2", "assets/templates/ru/wide/loot_empty2.png");
-            _analyzer.AddTemplate("Broken1", "assets/templates/ru/wide/loot_broken1.png");
-            _analyzer.AddTemplate("Broken2", "assets/templates/ru/wide/loot_broken2.png");
-            _analyzer.AddTemplate("Broken3", "assets/templates/ru/wide/loot_broken3.png");
-            _analyzer.AddTemplate("Broken4", "assets/templates/ru/wide/loot_broken4.png");
-            _analyzer.AddTemplate("Broken5", "assets/templates/ru/wide/loot_broken5.png");
-            _analyzer.AddTemplate("Broken6", "assets/templates/ru/wide/loot_broken6.png");
-            _analyzer.AddTemplate("Broken7", "assets/templates/ru/wide/loot_broken7.png");
-            _analyzer.AddTemplate("Broken8", "assets/templates/ru/wide/loot_broken8.png");
 
             this.screen = screen;
             sim = inputSimulator;
@@ -88,7 +75,7 @@ namespace tser
                         int column = i % 4;
 
                         var result = _analyzer.DetectCurrentWindow(new Rectangle(screen.CellPoint.X + screen.CellOffset * column, screen.CellPoint.Y + screen.CellOffset * row,
-                            screen.CellTemplateSize, screen.CellTemplateSize));
+                            screen.CellTemplateSize, screen.CellTemplateSize), nameof(FastLootHandler));
 
                         if (result == "Empty2")
                             break;
@@ -99,7 +86,7 @@ namespace tser
                         await mover.MoveAndClick(new Rectangle(screen.ClickCellPoint.X + screen.CellOffset * column, screen.ClickCellPoint.Y + screen.CellOffset * row,
                             screen.CellClickSize, screen.CellClickSize));
 
-                        if (!_analyzer.DetectCurrentWindow(screen.LootTitle, lootTitle))
+                        if (_analyzer.DetectCurrentWindow(screen.LootTitle, nameof(FastLootHandler) + "_Title") == null)
                             break;
                     }
                 }

@@ -216,14 +216,15 @@ namespace tser
             if (nCode >= 0)
             {
                 var handled = false;
-                var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
 
                 if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
                 {
+                    var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
                     handled = KeyDown((int)wParam, data);
                 }
                 else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null))
                 {
+                    var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
                     handled = KeyUp((int)wParam, data);
                 }
 
@@ -240,14 +241,15 @@ namespace tser
             {
                 var msg = (int)wParam.ToInt64();
                 var handled = false;
-                var data = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
 
                 if (msg == WM_XBUTTONDOWN)
                 {
+                    var data = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
                     handled = MouseDown((int)wParam, data);
                 }
                 if (msg == WM_XBUTTONUP)
                 {
+                    var data = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
                     handled = MouseUp((int)wParam, data);
                 }
                 //else if (((int)wParam.ToInt64() == WM_XBUTTONUP || wParam == WM_SYSKEYUP) && (KeyUp != null))

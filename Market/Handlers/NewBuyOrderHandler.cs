@@ -1,4 +1,5 @@
-﻿using tser.Screen.Screenshots;
+﻿using Microsoft.Extensions.DependencyInjection;
+using tser.Screen.Screenshots;
 
 namespace tser
 {
@@ -10,20 +11,17 @@ namespace tser
         private Mover mover;
         private ScreenAnalyzer _analyzer;
         private PriceTyper priceTyper;
+        private TemplateManager templateManager;
 
-        public NewBuyOrderHandler(InputSimulator inputSimulator, BuySellItemFullScreen screen, BuySellItemQualityScreen qualityScreen, ScreenAnalyzer screenAnalyzer) 
+        public NewBuyOrderHandler(IServiceProvider provider) 
         {
-            sim = inputSimulator;
-            this.screen = screen;
-            this.qualityScreen = qualityScreen;
+            sim = provider.GetRequiredService<InputSimulator>();
+            this.screen = provider.GetRequiredService<BuySellItemFullScreen>();
+            this.qualityScreen = provider.GetRequiredService<BuySellItemQualityScreen>();
             mover = new Mover(sim);
-            _analyzer = screenAnalyzer;
-            _analyzer.ClearTemplates();
-            _analyzer.AddTemplate("Normal", "assets/templates/ru/wide/buy_sell_item_quality_normal.png");
-            _analyzer.AddTemplate("Good", "assets/templates/ru/wide/buy_sell_item_quality_good.png");
-            _analyzer.AddTemplate("Outstanding", "assets/templates/ru/wide/buy_sell_item_quality_outstanding.png");
-            _analyzer.AddTemplate("Excelent", "assets/templates/ru/wide/buy_sell_item_quality_excelent.png");
-            _analyzer.AddTemplate("Masterpiece", "assets/templates/ru/wide/buy_sell_item_quality_masterpiece.png");
+            _analyzer = provider.GetRequiredService<ScreenAnalyzer>();
+            templateManager = provider.GetRequiredService<TemplateManager>();
+
             priceTyper = new PriceTyper(sim);
         }
 
@@ -35,7 +33,10 @@ namespace tser
 
             await Task.Delay(500);
 
-            var result = _analyzer.DetectCurrentWindow(qualityScreen.SelectRegion);
+            var result = _analyzer.DetectCurrentWindow(qualityScreen.SelectRegion, nameof(NewBuyOrderHandler));
+
+            if (result == null)
+                return;
 
             var selectedQuality = Enum.Parse<ItemQuality>(result);
 
@@ -95,27 +96,27 @@ namespace tser
                 : quality;
         }
 
-        public async Task BuyAndClose(int compositeBestBuyPrice, int bestBuyPrice)
+        public async Task BuyAndClose(CheckQualityContext context)
         {
             var bestSellPrice = _analyzer.GetPrice(screen.BestSellPriceRegion);
 
             // close
-            if (!ProfitCalculator.IsProfitable(compositeBestBuyPrice, bestSellPrice))
+            if (!ProfitCalculator.IsProfitable(context.CompositeBestBuyPrice, bestSellPrice))
             {
                 // close
-                if (compositeBestBuyPrice == bestBuyPrice || !ProfitCalculator.IsProfitable(bestBuyPrice, bestSellPrice))
+                if (context.CompositeBestBuyPrice == context.BestBuyPrice || !ProfitCalculator.IsProfitable(context.BestBuyPrice, bestSellPrice))
                 {
                     mover.MoveSmooth(screen.CloseRect);
                     return;
                 }
 
-                compositeBestBuyPrice = bestBuyPrice;
+                context.CompositeBestBuyPrice = context.BestBuyPrice;
             }
 
             // buy
             await mover.MoveAndClick(screen.PriceRect);
 
-            await priceTyper.TypePrice(compositeBestBuyPrice + 500);
+            await priceTyper.TypePrice(context.CompositeBestBuyPrice + 511);
 
             mover.MoveSmooth(screen.OkRect);
             return;
@@ -145,11 +146,15 @@ namespace tser
             }
 
             price.BestBuyPrice = _analyzer.GetPrice(screen.BestBuyPriceRegion);
-            price.CompositeBestBuyPrice = price.BestBuyPrice * 1.15 > price.CompositeBestBuyPrice ? price.CompositeBestBuyPrice : price.BestBuyPrice;
+            
+            if (price.CompositeBestBuyPrice == 0)
+                price.CompositeBestBuyPrice = price.BestBuyPrice;
+            else
+                price.CompositeBestBuyPrice = price.BestBuyPrice * 1.15 > price.CompositeBestBuyPrice ? price.CompositeBestBuyPrice : price.BestBuyPrice;
 
             if (quality == ItemQuality.Normal)
             {
-                await BuyAndClose(price.CompositeBestBuyPrice, price.BestBuyPrice);
+                await BuyAndClose(price);
                 return true;
             }
 
@@ -164,7 +169,7 @@ namespace tser
                 await SwitchQuality(quality);
                 await Task.Delay(500);
 
-                await BuyAndClose(price.CompositeBestBuyPrice, price.BestBuyPrice);
+                await BuyAndClose(price);
                 return true;
             }
 

@@ -22,5 +22,7 @@ namespace tser.Battle.Maps
         public bool IsRoyal { get; set; }
 
         public string Name { get; set; }
+
+        public string[] Neighbours { get; set; }
     }
 }

@@ -11,5 +11,7 @@ namespace tser
         public LootStrategy LootStrategy { get; set; }
 
         public bool OpenLootWindow { get; set; }
+
+        public Point GroupPanelPosition { get; set; }
     }
 }

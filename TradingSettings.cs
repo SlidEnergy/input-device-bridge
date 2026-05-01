@@ -9,5 +9,7 @@ namespace tser
     internal class TradingSettings
     {
         public int AllowedBestPriceOrderPosition { get; set; }
+
+        public bool FastBuy {  get; set; }
     }
 }

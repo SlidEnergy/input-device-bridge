@@ -19,10 +19,12 @@ namespace tser
         private System.Windows.Forms.Timer _timer;
         private Point _anchor;
         private const int Threshold = 5;
+        private readonly MapsManager mapsManager;
 
-        public GateHelperForm()
+        public GateHelperForm(MapsManager mapsManager)
         {
             InitializeComponent();
+            this.mapsManager = mapsManager;
         }
 
         public void SetText(string text)
@@ -96,13 +98,18 @@ namespace tser
 
             var center = ExtractCenterLevel(map.Type);
 
-            var smuggler = map.IsSmugglersNetworkMarket ? "Yes" : "No";
-
             sb.AppendLine(map.DisplayName);
             sb.AppendLine(tierQuality);
             sb.AppendLine(map.PvpCategory);
             sb.AppendLine($"Center: {center}");
-            sb.AppendLine($"Smuggler: {smuggler}");
+
+            var locations = mapsManager.FindInterestedLocations(map);
+
+            foreach (var loc in locations)
+            {
+                sb.AppendLine(loc.ToString());
+            }
+
 
             return sb.ToString();
         }

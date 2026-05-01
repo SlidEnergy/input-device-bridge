@@ -19,14 +19,16 @@ namespace tser
             services.AddSingleton<AppSettings>();
             services.AddSingleton<RegionManager>();
             services.AddSingleton<InputSimulator>();
+            services.AddSingleton<TemplateManager>();
             services.AddSingleton<ScreenAnalyzer>();
 
-            services.AddTransient<MainActionHandler>();
+            services.AddTransient<MarketActionHandler>();
 
             services.AddTransient<SpamQHandler>();
             services.AddTransient<SpamEHandler>();
             services.AddTransient<FastLootHandler>();
             services.AddTransient<GateHelperHandler>();
+            services.AddTransient<LowHpPlayerHandler>();
 
             services.AddTransient<Select43Handler>();
             services.AddTransient<Select52Handler>();
@@ -44,6 +46,7 @@ namespace tser
             services.AddTransient<BuySellItemQualityScreen>();
             services.AddTransient<MapScreen>();
             services.AddTransient<LootPersonScreen>();
+            services.AddTransient<GroupPanelScreen>();
 
             services.AddTransient<MainForm>();
             services.AddTransient<RegionManagerForm>();

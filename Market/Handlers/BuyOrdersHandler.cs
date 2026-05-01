@@ -51,7 +51,7 @@ namespace tser
 
             await mover.MoveAndClick(screen.PriceRect);
 
-            await priceTyper.TypePrice(bestBuyPrice + 1);
+            await priceTyper.TypePrice(bestBuyPrice + 511);
 
             mover.MoveSmooth(screen.OkRect);
         }

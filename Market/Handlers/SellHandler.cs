@@ -25,7 +25,7 @@
             var from = Cursor.Position;
 
             sim.LeftButtonClick();
-            await Task.Delay(50);
+            await Task.Delay(100);
 
             await mover.MoveAndClick(decreasePriceRect);
             await mover.MoveAndClick(orderSellRect);

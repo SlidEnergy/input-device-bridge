@@ -39,7 +39,7 @@
             textBox1.Multiline = true;
             textBox1.Name = "textBox1";
             textBox1.ReadOnly = true;
-            textBox1.Size = new Size(184, 76);
+            textBox1.Size = new Size(260, 104);
             textBox1.TabIndex = 1;
             textBox1.TabStop = false;
             // 
@@ -48,7 +48,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(184, 76);
+            ClientSize = new Size(260, 104);
             Controls.Add(textBox1);
             FormBorderStyle = FormBorderStyle.None;
             Name = "GateHelperForm";
