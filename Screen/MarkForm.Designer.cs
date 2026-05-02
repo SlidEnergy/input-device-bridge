@@ -1,6 +1,6 @@
 ﻿namespace tser
 {
-    partial class AlertForm
+    partial class MarkForm
     {
         /// <summary>
         /// Required designer variable.

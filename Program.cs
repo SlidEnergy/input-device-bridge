@@ -29,6 +29,7 @@ namespace tser
             services.AddTransient<FastLootHandler>();
             services.AddTransient<GateHelperHandler>();
             services.AddTransient<LowHpPlayerHandler>();
+            services.AddTransient<MarkerHelperHandler>();
 
             services.AddTransient<Select43Handler>();
             services.AddTransient<Select52Handler>();

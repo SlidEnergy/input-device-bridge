@@ -12,6 +12,6 @@ namespace tser
 
         public bool OpenLootWindow { get; set; }
 
-        public Point GroupPanelPosition { get; set; }
+        public string Name { get; set; }
     }
 }

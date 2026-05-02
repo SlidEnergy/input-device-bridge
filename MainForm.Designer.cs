@@ -47,10 +47,12 @@
             fastBuyCheckBox = new CheckBox();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
+            nameTextBox = new TextBox();
             setGroupPanelPositionButton = new Button();
-            lowHpPlayerHelperRadioButton = new RadioButton();
             comPortsComboBox = new ComboBox();
             connectButton = new Button();
+            lowHpHelperRadioButton = new RadioButton();
+            markerHelperRadioButton = new RadioButton();
             ((System.ComponentModel.ISupportInitialize)allowedBestPriceOrderPositionNumericUpDown).BeginInit();
             panel1.SuspendLayout();
             SuspendLayout();
@@ -58,7 +60,7 @@
             // bootsellButton
             // 
             bootsellButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            bootsellButton.Location = new Point(93, 392);
+            bootsellButton.Location = new Point(93, 420);
             bootsellButton.Name = "bootsellButton";
             bootsellButton.Size = new Size(75, 23);
             bootsellButton.TabIndex = 1;
@@ -69,7 +71,7 @@
             // testButton
             // 
             testButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            testButton.Location = new Point(12, 392);
+            testButton.Location = new Point(12, 420);
             testButton.Name = "testButton";
             testButton.Size = new Size(75, 23);
             testButton.TabIndex = 2;
@@ -183,7 +185,7 @@
             // regionManagerButton
             // 
             regionManagerButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            regionManagerButton.Location = new Point(174, 392);
+            regionManagerButton.Location = new Point(174, 420);
             regionManagerButton.Name = "regionManagerButton";
             regionManagerButton.Size = new Size(123, 23);
             regionManagerButton.TabIndex = 17;
@@ -238,7 +240,7 @@
             // 
             groupBox1.Location = new Point(12, 73);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(272, 278);
+            groupBox1.Size = new Size(272, 341);
             groupBox1.TabIndex = 21;
             groupBox1.TabStop = false;
             groupBox1.Text = "Market";
@@ -247,10 +249,18 @@
             // 
             groupBox2.Location = new Point(290, 73);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(254, 278);
+            groupBox2.Size = new Size(254, 341);
             groupBox2.TabIndex = 22;
             groupBox2.TabStop = false;
             groupBox2.Text = "Battle";
+            // 
+            // nameTextBox
+            // 
+            nameTextBox.Location = new Point(318, 354);
+            nameTextBox.Name = "nameTextBox";
+            nameTextBox.Size = new Size(100, 23);
+            nameTextBox.TabIndex = 1;
+            nameTextBox.TextChanged += nameTextBox_TextChanged;
             // 
             // setGroupPanelPositionButton
             // 
@@ -261,17 +271,6 @@
             setGroupPanelPositionButton.Text = "Set Group Panel Position";
             setGroupPanelPositionButton.UseVisualStyleBackColor = true;
             setGroupPanelPositionButton.Click += setGroupPanelPositionButton_Click;
-            // 
-            // lowHpPlayerHelperRadioButton
-            // 
-            lowHpPlayerHelperRadioButton.AutoSize = true;
-            lowHpPlayerHelperRadioButton.Location = new Point(300, 278);
-            lowHpPlayerHelperRadioButton.Name = "lowHpPlayerHelperRadioButton";
-            lowHpPlayerHelperRadioButton.Size = new Size(100, 19);
-            lowHpPlayerHelperRadioButton.TabIndex = 0;
-            lowHpPlayerHelperRadioButton.Text = "Low hp helper";
-            lowHpPlayerHelperRadioButton.UseVisualStyleBackColor = true;
-            lowHpPlayerHelperRadioButton.CheckedChanged += lowHpPlayerHelperRadioButton_CheckedChanged;
             // 
             // comPortsComboBox
             // 
@@ -291,13 +290,39 @@
             connectButton.UseVisualStyleBackColor = true;
             connectButton.Click += connectButton_Click;
             // 
+            // lowHpHelperRadioButton
+            // 
+            lowHpHelperRadioButton.AutoSize = true;
+            lowHpHelperRadioButton.Location = new Point(300, 277);
+            lowHpHelperRadioButton.Name = "lowHpHelperRadioButton";
+            lowHpHelperRadioButton.Size = new Size(100, 19);
+            lowHpHelperRadioButton.TabIndex = 27;
+            lowHpHelperRadioButton.TabStop = true;
+            lowHpHelperRadioButton.Text = "Low hp helper";
+            lowHpHelperRadioButton.UseVisualStyleBackColor = true;
+            lowHpHelperRadioButton.CheckedChanged += lowHpHelperRadioButton_CheckedChanged;
+            // 
+            // markerHelperRadioButton
+            // 
+            markerHelperRadioButton.AutoSize = true;
+            markerHelperRadioButton.Location = new Point(300, 329);
+            markerHelperRadioButton.Name = "markerHelperRadioButton";
+            markerHelperRadioButton.Size = new Size(98, 19);
+            markerHelperRadioButton.TabIndex = 28;
+            markerHelperRadioButton.TabStop = true;
+            markerHelperRadioButton.Text = "Marker helper";
+            markerHelperRadioButton.UseVisualStyleBackColor = true;
+            markerHelperRadioButton.CheckedChanged += markerHelperRadioButton_CheckedChanged;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(556, 427);
+            ClientSize = new Size(556, 455);
+            Controls.Add(markerHelperRadioButton);
+            Controls.Add(lowHpHelperRadioButton);
+            Controls.Add(nameTextBox);
             Controls.Add(setGroupPanelPositionButton);
-            Controls.Add(lowHpPlayerHelperRadioButton);
             Controls.Add(connectButton);
             Controls.Add(comPortsComboBox);
             Controls.Add(spamQRadioButton);
@@ -350,7 +375,9 @@
         private GroupBox groupBox2;
         private ComboBox comPortsComboBox;
         private Button connectButton;
-        private RadioButton lowHpPlayerHelperRadioButton;
         private Button setGroupPanelPositionButton;
+        private TextBox nameTextBox;
+        private RadioButton lowHpHelperRadioButton;
+        private RadioButton markerHelperRadioButton;
     }
 }

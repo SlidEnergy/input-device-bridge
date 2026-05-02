@@ -8,7 +8,7 @@
     <Compile Update="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Screen\AlertForm.cs">
+    <Compile Update="Screen\MarkForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Screen\AskNameForm.cs">

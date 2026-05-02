@@ -10,17 +10,13 @@ using System.Windows.Forms;
 
 namespace tser
 {
-    public partial class AlertForm : Form
+    public partial class MarkForm : Form
     {
         private readonly System.Windows.Forms.Timer _timer;
 
-        public AlertForm()
+        public MarkForm()
         {
             InitializeComponent();
-
-            var original = (Image)Properties.Resources.ResourceManager.GetObject("alert");
-
-            var icon = new Bitmap(original, new Size(48, 48));
 
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.None;
@@ -30,16 +26,8 @@ namespace tser
             BackColor = Color.Magenta;
             TransparencyKey = Color.Magenta;
 
-            Width = icon.Width;
-            Height = icon.Height;
-
-            var pb = new PictureBox
-            {
-                Image = icon,
-                SizeMode = PictureBoxSizeMode.AutoSize
-            };
-
-            Controls.Add(pb);
+            Width = 48;
+            Height = 48;
 
             var screen = System.Windows.Forms.Screen.PrimaryScreen.Bounds;
             Location = new Point(
@@ -54,6 +42,31 @@ namespace tser
                 _timer.Stop();
                 Close();
             };
+        }
+
+        public void SetIcon(string name)
+        {
+            var original = (Image)Properties.Resources.ResourceManager.GetObject(name);
+
+            var icon = new Bitmap(original, new Size(48, 48));
+
+            var pb = new PictureBox
+            {
+                Image = icon,
+                SizeMode = PictureBoxSizeMode.AutoSize
+            };
+
+            Controls.Add(pb);
+        }
+
+        public void SetPosition(Point position)
+        {
+            Location = position;
+        }
+
+        public void SetTimeout(int timeout)
+        {
+            _timer.Interval = timeout;
         }
 
         protected override void OnShown(EventArgs e)

@@ -27,6 +27,7 @@ namespace tser
         private SpamQHandler _spamQHandler;
         private SpamEHandler _spamEHandler;
         private LowHpPlayerHandler _lowHpPlayerHelperHandler;
+        private MarkerHelperHandler _markerHelperHandler;
 
         private Kmh _kmh;
         private AppSettings _settings;
@@ -71,6 +72,7 @@ namespace tser
             _spamQHandler = _serviceProvider.GetRequiredService<SpamQHandler>();
             _spamEHandler = _serviceProvider.GetRequiredService<SpamEHandler>();
             _lowHpPlayerHelperHandler = _serviceProvider.GetRequiredService<LowHpPlayerHandler>();
+            _markerHelperHandler = _serviceProvider.GetRequiredService<MarkerHelperHandler>();
 
             _settings.TradingSettings.AllowedBestPriceOrderPosition = (int)allowedBestPriceOrderPositionNumericUpDown.Value;
             _settings.BattleSettings.LootStrategy = bestLootStrategyRadioButton.Checked ? LootStrategy.Best : LootStrategy.All;
@@ -260,7 +262,13 @@ namespace tser
             {
                 if ((lParam.mouseData >> 16) == XBUTTON2)
                 {
-                    if (buyAndSellRadioButton.Checked)
+                    if (setPositionMode)
+                    {
+                        RunAsync(_lowHpPlayerHelperHandler.Calibrate);
+                        setPositionMode = false;
+                        return true;
+                    }
+                    else if (buyAndSellRadioButton.Checked)
                     {
                         //const int VK_CONTROL = 0x11;
                         //bool ctrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
@@ -294,7 +302,7 @@ namespace tser
 
                         return true;
                     }
-                    else if (lowHpPlayerHelperRadioButton.Checked && lowHpPlayerHelperActivated)
+                    else if (lowHpHelperRadioButton.Checked && lowHpPlayerHelperActivated)
                     {
                         RunAsync(_lowHpPlayerHelperHandler.Run);
 
@@ -463,26 +471,53 @@ namespace tser
 
         private void setGroupPanelPositionButton_Click(object sender, EventArgs e)
         {
-            _settings.BattleSettings.GroupPanelPosition = new Point(610, 554);
+            setPositionMode = true;
+            //_settings.BattleSettings.GroupPanelPosition = new Point(610, 554);
         }
 
+        private bool setPositionMode = false;
         private bool lowHpPlayerHelperActivated = false;
 
-        private void lowHpPlayerHelperRadioButton_CheckedChanged(object sender, EventArgs e)
+        private void lowHpHelperRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if (lowHpPlayerHelperRadioButton.Checked && lowHpPlayerHelperActivated == false)
+            if (lowHpHelperRadioButton.Checked && lowHpPlayerHelperActivated == false)
             {
                 lowHpPlayerHelperActivated = true;
                 RunAsync(_lowHpPlayerHelperHandler.Activate);
                 return;
             }
-            
-            if (!lowHpPlayerHelperRadioButton.Checked && lowHpPlayerHelperActivated == true)
+
+            if (!lowHpHelperRadioButton.Checked && lowHpPlayerHelperActivated == true)
             {
                 lowHpPlayerHelperActivated = false;
                 RunAsync(_lowHpPlayerHelperHandler.Deactivate);
                 return;
             }
+        }
+
+
+        private bool markerhelperActivated = false;
+
+        private void markerHelperRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (markerHelperRadioButton.Checked && markerhelperActivated == false)
+            {
+                markerhelperActivated = true;
+                RunAsync(_markerHelperHandler.Activate);
+                return;
+            }
+
+            if (!markerHelperRadioButton.Checked && markerhelperActivated == true)
+            {
+                markerhelperActivated = false;
+                RunAsync(_markerHelperHandler.Deactivate);
+                return;
+            }
+        }
+
+        private void nameTextBox_TextChanged(object sender, EventArgs e)
+        {
+            _settings.BattleSettings.Name = nameTextBox.Text;
         }
     }
 }
