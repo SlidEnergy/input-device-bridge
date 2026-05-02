@@ -22,10 +22,11 @@ namespace tser
         private ScreenAnalyzer _analyzer;
         private readonly GroupPanelScreen screen;
 
-        private int LowHpIndex = 0;
+        private int LowHpIndex = -1;
         private CancellationTokenSource _cts;
         private HandlerContext context;
         private Point cornerPosition;
+        private DateTime _lastShowDateTime;
 
         public LowHpPlayerHandler(InputSimulator inputSimulator, AppSettings appSettings, ScreenAnalyzer screenAnalyzer, GroupPanelScreen screen)
         {
@@ -74,6 +75,7 @@ namespace tser
                 {
                     var mat = _analyzer.CaptureRegion(groupPanelRect);
 
+                    double[] hpArray = new double[_count];
                     var accumulatedHeight = 0;
 
                     for (int rowIndex = 0; rowIndex < _count; rowIndex++)
@@ -96,21 +98,55 @@ namespace tser
 
                         using var cropped = new OpenCvSharp.Mat(mat, new OpenCvSharp.Rect(hpBarRect.X, hpBarRect.Y, hpBarRect.Width, hpBarRect.Height));
 
-                        OpenCvSharp.Cv2.ImWrite("hp_debug.png", cropped);
+                        //OpenCvSharp.Cv2.ImWrite("hp_debug.png", cropped);
 
-                        if (IsLowHp(mat, hpBarRect))
+                        var hp = GetHp(mat, hpBarRect);
+
+                        hpArray[rowIndex] = hp;
+
+                        if (hp < 0.4 && hp > 0.05 && DateTime.Now - _lastShowDateTime > TimeSpan.FromMilliseconds(2000))
                         {
-                            LowHpIndex = rowIndex;
+                            _lastShowDateTime = DateTime.Now;
                             ShowAsterics();
-                            await Task.Delay(2000);
-                            break;
                         }
+                        //if (IsLowHp(mat, hpBarRect))
+                        //{
+                        //    LowHpIndex = rowIndex;
+                        //    ShowAsterics();
+                        //    await Task.Delay(2000);
+                        //    break;
+                        //}
+                    }
+
+                    var minIndex = GetMinHpIndex(hpArray);
+
+                    if (minIndex >= 0)
+                    {
+                        LowHpIndex = minIndex;
                     }
 
                     await Task.Delay(500);
                 }
             }
             catch (TaskCanceledException) { }
+        }
+
+        private int GetMinHpIndex(double[] hp)
+        {
+
+            var min = 1.0d;
+            var minIndex = -1;
+
+            for (int i = 0; i < _count; i++)
+            {
+                if (hp[i] < min && hp[i] > 0.05)
+                {
+                    min = hp[i];
+                    minIndex = i;
+                }
+            }
+
+            return minIndex;
         }
 
         private void ShowAsterics()
@@ -259,12 +295,10 @@ namespace tser
             return Task.CompletedTask;
         }
 
-        [DllImport("user32.dll")]
-        private static extern bool GetCursorPos(out POINT lpPoint);
-
         public async Task Run(HandlerContext context)
         {
-            sim.KeyPress((Keys)((int)Keys.D0 + LowHpIndex + 1));
+            if(LowHpIndex >= 0)
+                sim.KeyPress((Keys)((int)Keys.D0 + LowHpIndex + 1));
         }
 
         private unsafe (byte r, byte g, byte b) GetPixel(OpenCvSharp.Mat mat, int x, int y)
@@ -348,6 +382,19 @@ namespace tser
                 return true;
 
             return false;
+        }
+
+        private double GetHp(OpenCvSharp.Mat mat, Rectangle hpBarRect)
+        {
+            var votes = CalculateVotes(mat, hpBarRect);
+
+            bool IsFilledColumn(int x) => votes[x] >= 3;
+
+            var filledWidth = CalculateFilledWidth(votes);
+
+            double percent = (double)filledWidth / _width;
+
+            return percent;
         }
 
         bool IsRed(byte r, byte g, byte b)
