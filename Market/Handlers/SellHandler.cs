@@ -29,9 +29,8 @@
 
             await mover.MoveAndClick(decreasePriceRect);
             await mover.MoveAndClick(orderSellRect);
-
             await mover.MoveAndClick(okRect);
-
+            await Task.Delay(100);
             //await mover.MoveAndClick(609, 510, 618, 519);
 
             //await mover.MoveAndClick(844, 722, 926, 740);

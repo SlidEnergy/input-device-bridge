@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,6 +14,13 @@ namespace tser
     public partial class MarkForm : Form
     {
         private readonly System.Windows.Forms.Timer _timer;
+
+        [DllImport("user32.dll")]
+        static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint dwAffinity);
+
+        const uint WDA_NONE = 0;
+        const uint WDA_MONITOR = 1;
+        const uint WDA_EXCLUDEFROMCAPTURE = 0x11;
 
         public MarkForm()
         {
@@ -42,6 +50,8 @@ namespace tser
                 _timer.Stop();
                 Close();
             };
+
+            //SetWindowDisplayAffinity(this.Handle, WDA_EXCLUDEFROMCAPTURE);
         }
 
         public void SetIcon(string name)

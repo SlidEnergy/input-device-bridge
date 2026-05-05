@@ -26,6 +26,7 @@ namespace tser
         private HandlerContext context;
 
         private System.Drawing.Point point;
+        private TesseractEngine ocr;
 
         public MarkerHelperHandler(InputSimulator inputSimulator, AppSettings appSettings, ScreenAnalyzer screenAnalyzer, GroupPanelScreen screen)
         {
@@ -59,8 +60,13 @@ namespace tser
 
         public async Task Loop(CancellationToken cancellationToken)
         {
+            if(ocr != null)
+            {
+                ocr.Dispose();
+            }
+
             // OCR
-            using var ocr = new TesseractEngine("./assets/tessdata", "eng", EngineMode.Default);
+            ocr = new TesseractEngine("./assets/tessdata", "eng", EngineMode.Default);
 
             // Только латиница
             ocr.SetVariable("tessedit_char_whitelist",
@@ -75,98 +81,14 @@ namespace tser
                     {
                         await Task.Delay(2000);
                         continue;
-                    }    
-
-                    Dictionary<string, System.Drawing.Point> names = new Dictionary<string, System.Drawing.Point>();
-                    //// Создаем bitmap нужного размера
-                    //using var bmp = new Bitmap(screenRegion.Width, screenRegion.Height, PixelFormat.Format24bppRgb);
-
-                    //// Захватываем область экрана
-                    //using (var g = Graphics.FromImage(bmp))
-                    //    g.CopyFromScreen(screenRegion.Left, screenRegion.Top, 0, 0, screenRegion.Size, CopyPixelOperation.SourceCopy);
-
-                    //Mat screen = new Mat();
-                    //// Конвертируем в Mat
-                    //var mat = BitmapConverter.ToMat(bmp);
-                    //if (mat.Type() != MatType.CV_8UC1)
-                    //    mat.ConvertTo(screen, MatType.CV_8UC1);
+                    }
 
                     var screen = _analyzer.CaptureRegion(screenRegion);
 
                     var squares = await FindSquares(screen);
 
-                    foreach (var rect in squares)
-                    {
-                        // Рисуем найденный квадрат
-                        //Cv2.Rectangle(screen, rect, Scalar.Lime, 2);
+                    //DetectAndShowMarker(screen, squares);
 
-                        // ROI справа от квадрата
-                        OpenCvSharp.Rect textRect = new OpenCvSharp.Rect(
-                            rect.X + rect.Width,
-                            rect.Y,
-                            300,
-                            rect.Height);
-
-                        //Cv2.Rectangle(screen, textRect, Scalar.Lime, 2);
-
-                        // Проверка границ
-                        if (textRect.Right >= screen.Width)
-                            textRect.Width -= textRect.Right - screen.Width;
-
-                        if(textRect.Bottom >= screen.Height)
-                            textRect.Height -= textRect.Bottom - screen.Height;
-
-                        if (textRect.X < 0)
-                            textRect.X = 0;
-
-                        if (textRect.Y < 0)
-                            textRect.Y = 0;
-
-                        using var textRoi = new Mat(screen, textRect);
-                        using var letterRoi = new Mat(screen, new OpenCvSharp.Rect(rect.X + 1, rect.Y - 1, rect.Width - 2, rect.Height - 2));
-
-                        // OCR preprocessing
-                        using var processed = PreprocessForOCR(textRoi);
-                        using var processedletter = PreprocessForOCR(letterRoi);
-
-                        // OCR
-                        string text = ReadText(ocr, processed);
-                        string letter = ReadText(ocr, processedletter);
-
-                        text = letter + text;
-
-                        //if (!string.IsNullOrWhiteSpace(text))
-                        //{
-                        //    Console.WriteLine(text);
-
-                        //    // Overlay debug
-                        //    Cv2.PutText(
-                        //        screen,
-                        //        text,
-                        //        new OpenCvSharp.Point(rect.X, rect.Y - 10),
-                        //        HersheyFonts.HersheySimplex,
-                        //        0.6,
-                        //        Scalar.Yellow,
-                        //        2);
-                        //}
-
-                        var point = new System.Drawing.Point(rect.X + rect.Width / 2, rect.Y -48 + 70);
-                        names.Add(Normalize(text), point);
-                    }
-
-                    var find = FindClosest(settings.BattleSettings.Name, names);
-
-                    if (find != null)
-                    {
-                        point = find.Point;
-                        ShowAsterics();
-                    }
-
-
-                    //context.SynchronizationContext.Post(_ =>
-                    //{
-                    //    Cv2.ImShow("debug", screen);
-                    //}, null);
 
 
                     await Task.Delay(400);
@@ -177,6 +99,83 @@ namespace tser
             {
 
             }
+        }
+
+        private void DetectAndShowMarker(Mat screen, List<OpenCvSharp.Rect> squares)
+        {
+            Dictionary<string, System.Drawing.Point> names = new Dictionary<string, System.Drawing.Point>();
+
+            foreach (var rect in squares)
+            {
+                // Рисуем найденный квадрат
+                //Cv2.Rectangle(screen, rect, Scalar.Lime, 2);
+
+                // ROI справа от квадрата
+                OpenCvSharp.Rect textRect = new OpenCvSharp.Rect(
+                    rect.X + rect.Width,
+                    rect.Y,
+                    300,
+                    rect.Height);
+
+                //Cv2.Rectangle(screen, textRect, Scalar.Lime, 2);
+
+                // Проверка границ
+                if (textRect.Right >= screen.Width)
+                    textRect.Width -= textRect.Right - screen.Width;
+
+                if (textRect.Bottom >= screen.Height)
+                    textRect.Height -= textRect.Bottom - screen.Height;
+
+                if (textRect.X < 0)
+                    textRect.X = 0;
+
+                if (textRect.Y < 0)
+                    textRect.Y = 0;
+
+                using var textRoi = new Mat(screen, textRect);
+                using var letterRoi = new Mat(screen, new OpenCvSharp.Rect(rect.X + 1, rect.Y - 1, rect.Width - 2, rect.Height - 2));
+
+                // OCR preprocessing
+                using var processed = PreprocessForOCR(textRoi);
+                using var processedletter = PreprocessForOCR(letterRoi);
+
+                // OCR
+                string text = ReadText(ocr, processed);
+                string letter = ReadText(ocr, processedletter);
+
+                text = letter + text;
+
+                //if (!string.IsNullOrWhiteSpace(text))
+                //{
+                //    Console.WriteLine(text);
+
+                //    // Overlay debug
+                //    Cv2.PutText(
+                //        screen,
+                //        text,
+                //        new OpenCvSharp.Point(rect.X, rect.Y - 10),
+                //        HersheyFonts.HersheySimplex,
+                //        0.6,
+                //        Scalar.Yellow,
+                //        2);
+                //}
+
+                var point = new System.Drawing.Point(rect.X + rect.Width / 2, rect.Y - 48 + 70);
+                names.Add(Normalize(text), point);
+            }
+
+            var find = FindClosest(settings.BattleSettings.Name, names);
+
+            if (find != null)
+            {
+                point = find.Point;
+                ShowAsterics();
+            }
+
+            //context.SynchronizationContext.Post(_ =>
+            //{
+            //    Cv2.ImShow("debug", screen);
+            //}, null);
         }
 
         static Mat PreprocessForOCR(Mat src)

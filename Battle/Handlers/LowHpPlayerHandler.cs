@@ -1,8 +1,11 @@
-﻿using System.Drawing;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using tser.Battle.Maps;
 using tser.Screen.Screenshots;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace tser
 {
@@ -14,27 +17,34 @@ namespace tser
         private int _count = 0;
         private List<int> _heights = new List<int>();
         //private int offsettY = 5;
-        private List<int> _verticalOffsets = new List<int>();
+        private List<int> _verticalOffsetsBetweenHp = new List<int>();
 
         private InputSimulator sim;
         private readonly AppSettings settings;
         private Mover mover;
         private ScreenAnalyzer _analyzer;
         private readonly GroupPanelScreen screen;
-
+        private readonly IServiceProvider serviceProvider;
         private int LowHpIndex = -1;
         private CancellationTokenSource _cts;
         private HandlerContext context;
         private Point cornerPosition;
         private DateTime _lastShowDateTime;
+        private double _lowLimit = 0.05;
+        private double _alarmLimit = 0.4;
+        private bool _isCalibrated = false;
+        private int _verticalOffsetFromCornerPosition = 0;
+        private int _horisontalOffsetFromCornerPosition = 0;
 
-        public LowHpPlayerHandler(InputSimulator inputSimulator, AppSettings appSettings, ScreenAnalyzer screenAnalyzer, GroupPanelScreen screen)
+        public LowHpPlayerHandler(IServiceProvider serviceProvider)
         {
-            _analyzer = screenAnalyzer;
+            this.serviceProvider = serviceProvider;
 
-            this.screen = screen;
-            sim = inputSimulator;
-            settings = appSettings;
+            sim = serviceProvider.GetRequiredService<InputSimulator>();
+            screen = serviceProvider.GetRequiredService<GroupPanelScreen>();
+            settings = serviceProvider.GetRequiredService<AppSettings>();
+            _analyzer = serviceProvider.GetRequiredService<ScreenAnalyzer>();
+
             mover = new Mover(sim);
         }
 
@@ -60,19 +70,22 @@ namespace tser
 
         public async Task Loop(CancellationToken cancellationToken)
         {
-            if (cornerPosition == null)
-                return;
-
-            var groupPanelRect = new Rectangle(
-                cornerPosition.X,
-                cornerPosition.Y,
-                _width,
-                (_heights.Sum() + _verticalOffsets.Sum()));
-
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
+                    if (!_isCalibrated)
+                    {
+                        await Task.Delay(1000);
+                        continue;
+                    }
+
+                    var groupPanelRect = new Rectangle(
+                        cornerPosition.X,
+                        cornerPosition.Y,
+                        _width,
+                        (_heights.Sum() + _verticalOffsetsBetweenHp.Sum()));
+
                     var mat = _analyzer.CaptureRegion(groupPanelRect);
 
                     double[] hpArray = new double[_count];
@@ -94,7 +107,7 @@ namespace tser
                             _heights[rowIndex]
                         );
 
-                        accumulatedHeight += _heights[rowIndex] + _verticalOffsets[rowIndex];
+                        accumulatedHeight += _heights[rowIndex] + _verticalOffsetsBetweenHp[rowIndex];
 
                         using var cropped = new OpenCvSharp.Mat(mat, new OpenCvSharp.Rect(hpBarRect.X, hpBarRect.Y, hpBarRect.Width, hpBarRect.Height));
 
@@ -104,7 +117,7 @@ namespace tser
 
                         hpArray[rowIndex] = hp;
 
-                        if (hp < 0.4 && hp > 0.05 && DateTime.Now - _lastShowDateTime > TimeSpan.FromMilliseconds(2000))
+                        if (hp < _alarmLimit && hp >= _lowLimit && DateTime.Now - _lastShowDateTime > TimeSpan.FromMilliseconds(2000))
                         {
                             _lastShowDateTime = DateTime.Now;
                             ShowAsterics();
@@ -139,7 +152,7 @@ namespace tser
 
             for (int i = 0; i < _count; i++)
             {
-                if (hp[i] < min && hp[i] > 0.05)
+                if (hp[i] < min && hp[i] >= _lowLimit)
                 {
                     min = hp[i];
                     minIndex = i;
@@ -170,7 +183,7 @@ namespace tser
 
                 var (r, g, b) = GetPixel(mat, cursor.X, cursor.Y); // из bitmap/mat
 
-                if (!IsRedBottom(r, g, b))
+                if (!IsRedMiddle(r, g, b))
                     break;
 
                 startPosition.Y = cursor.Y;
@@ -184,7 +197,7 @@ namespace tser
 
                 var (r, g, b) = GetPixel(mat, cursor.X, cursor.Y); // из bitmap/mat
 
-                if (!IsRedBottom(r, g, b))
+                if (!IsRedMiddle(r, g, b))
                     break;
 
                 startPosition.X = cursor.X;
@@ -200,7 +213,7 @@ namespace tser
             var cursor = new Point(startPosition.X + 3, startPosition.Y);
             var height = 1;
             var index = 0;
-            _verticalOffsets.Clear();
+            _verticalOffsetsBetweenHp.Clear();
             _heights.Clear();
             bool calcOffset = false;
 
@@ -213,14 +226,23 @@ namespace tser
                 var isRed = IsRedBottom(r, g, b);
                 if (!calcOffset && !isRed)
                 {
-                    _heights.Add(height);
-                    height = 0;
-                    calcOffset = true;
-                    index++;
+                    if (height < 7)
+                    {
+                        height = _heights[_heights.Count() - 1] + height;
+                        _heights.RemoveAt(_heights.Count() - 1);
+                        calcOffset = true;
+                    }
+                    else
+                    {
+                        _heights.Add(height);
+                        height = 0;
+                        calcOffset = true;
+                        index++;
+                    }
                 }
                 else if (calcOffset && isRed)
                 {
-                    _verticalOffsets.Add(height);
+                    _verticalOffsetsBetweenHp.Add(height);
                     height = 0;
                     calcOffset = false;
                 }
@@ -229,7 +251,7 @@ namespace tser
 
                 if (height > 20)
                 {
-                    _verticalOffsets.Add(3);
+                    _verticalOffsetsBetweenHp.Add(3);
                     _count = index;
                     break;
                 }
@@ -248,7 +270,7 @@ namespace tser
 
                 var (r, g, b) = GetPixel(mat, cursor.X, cursor.Y); // из bitmap/mat
 
-                if (!IsRedBottom(r, g, b))
+                if (!IsRedTop(r, g, b))
                     break;
 
                 width1++;
@@ -272,6 +294,21 @@ namespace tser
             }
 
             _width = Math.Max(width1, width2);
+
+            // add points lefter the corner
+
+            if (_heights[0] >= 15)
+            {
+                _verticalOffsetFromCornerPosition = 2;
+                _horisontalOffsetFromCornerPosition = 2;
+            }
+            else
+            {
+                _verticalOffsetFromCornerPosition = 1;
+                _horisontalOffsetFromCornerPosition = 1;
+            }
+
+            _width += _horisontalOffsetFromCornerPosition;
         }
 
         public Task Calibrate(HandlerContext context)
@@ -284,20 +321,40 @@ namespace tser
 
             CalcWidth(mat, cornerPosition, _heights[0]);
 
+            cornerPosition.X -= _horisontalOffsetFromCornerPosition;
+
             var groupPanelRect = new Rectangle(
                 cornerPosition.X,
                 cornerPosition.Y,
                 _width,
-                _heights.Sum() + _verticalOffsets.Sum());
+                _heights.Sum() + _verticalOffsetsBetweenHp.Sum());
 
             var mat2 = _analyzer.CaptureRegion(groupPanelRect);
+
+            ShowTooltip(context, new Point(cursor.X + 20, cursor.Y + 20));
+
+            _isCalibrated = true;
 
             return Task.CompletedTask;
         }
 
+        private void ShowTooltip(HandlerContext context, Point position)
+        {
+            context.SynchronizationContext.Post(_ =>
+            {
+                var form = serviceProvider.GetRequiredService<GateHelperForm>();
+                form.SetText("width = " + _width + "\r\ncount = " + _count);
+
+                form.SetLocation(position);
+                form.Show();
+
+                form.InitAutoClose(Cursor.Position);
+            }, null);
+        }
+
         public async Task Run(HandlerContext context)
         {
-            if(LowHpIndex >= 0)
+            if (LowHpIndex >= 0)
                 sim.KeyPress((Keys)((int)Keys.D0 + LowHpIndex + 1));
         }
 
@@ -314,10 +371,13 @@ namespace tser
 
             for (int dy = 0; dy < 2; dy++)
             {
-                int y = hpBarRect.Top + dy;
-
                 for (int x = 0; x < hpBarRect.Width; x++)
                 {
+                    int y = hpBarRect.Top + dy;
+
+                    if (x < _horisontalOffsetFromCornerPosition)
+                        y += _verticalOffsetFromCornerPosition;
+
                     var (r, g, b) = GetPixel(mat, x, y); // из bitmap/mat
 
                     if (IsRedTop(r, g, b))
@@ -327,10 +387,13 @@ namespace tser
 
             for (int dy = 0; dy < 2; dy++)
             {
-                int y = hpBarRect.Top + hpBarRect.Height - dy - 1;
-
                 for (int x = 0; x < hpBarRect.Width; x++)
                 {
+                    int y = hpBarRect.Top + hpBarRect.Height - dy - 1;
+
+                    if (x < _horisontalOffsetFromCornerPosition)
+                        y -= _verticalOffsetFromCornerPosition;
+
                     var (r, g, b) = GetPixel(mat, x, y); // из bitmap/mat
 
                     if (IsRedBottom(r, g, b))
@@ -361,7 +424,8 @@ namespace tser
                     if (gap > 2)
                         break;
 
-                    filledWidth++;
+                    if (filledWidth > 0)
+                        filledWidth++;
                 }
             }
 
@@ -378,7 +442,7 @@ namespace tser
 
             double percent = (double)filledWidth / _width;
 
-            if (percent < 0.5 && percent > 0.05)
+            if (percent < _alarmLimit && percent >= _lowLimit)
                 return true;
 
             return false;
@@ -397,11 +461,13 @@ namespace tser
             return percent;
         }
 
-        bool IsRed(byte r, byte g, byte b)
+        bool IsRedMiddle(byte r, byte g, byte b)
         {
             return r > 150 &&              // отсечь темный фон
-                   r > g * 1.3 &&
-                   r > b * 1.3;
+                   r > g * 1.5 &&
+                   r > b * 1.5 &&
+                   g < 100 &&          // ограничиваем желтизну
+                   b < 80;
         }
 
         bool IsRedTop(byte r, byte g, byte b)

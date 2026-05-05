@@ -39,7 +39,7 @@ namespace tser.Battle.Maps
 
             var list = JsonSerializer.Deserialize<List<AvaRoadEntry>>(json, options);
 
-            roads = list.ToDictionary(x => x.Name, x => x);
+            roads = list.ToDictionary(x => Normalize(x.Name), x => x);
         }
 
 

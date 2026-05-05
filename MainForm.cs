@@ -8,6 +8,7 @@ using tser.Battle.Maps;
 using System.Management;
 using System.IO.Ports;
 using OpenCvSharp.ML;
+using System.Text;
 
 namespace tser
 {
@@ -42,6 +43,9 @@ namespace tser
 
         private HandlerContext uiContext = new HandlerContext();
 
+        private bool _debugMode = false; //System.Diagnostics.Debugger.IsAttached;
+        private bool _isConnected = false;
+
         public MainForm(IServiceProvider provider)
         {
             InitializeComponent();
@@ -56,7 +60,7 @@ namespace tser
             _mapManager = provider.GetRequiredService<MapsManager>();
 
             // Отключаем лаги при отладке
-            var autohook = true;// !System.Diagnostics.Debugger.IsAttached;
+            var autohook = !_debugMode;
 
             _kmh = new Kmh(autohook);
             _kmh.KeyDown += _kmh_KeyDown;
@@ -121,27 +125,52 @@ namespace tser
 
         }
 
-        private CancellationTokenSource _cts = new();
+        //private CancellationTokenSource _cts = new();
 
-        private async Task MonitorPortAsync()
+        //private async Task MonitorPortAsync()
+        //{
+        //    while (!_cts.Token.IsCancellationRequested)
+        //    {
+        //        if (!inputSimulator.IsOpen)
+        //        {
+        //            try
+        //            {
+        //                inputSimulator.OpenSerialPort();
+        //                Debug.WriteLine("COM port opened");
+        //            }
+        //            catch
+        //            {
+        //                // игнор, пробуем снова
+        //            }
+        //        }
+
+        //        await Task.Delay(2000, _cts.Token);
+        //    }
+        //}
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        public static extern bool IsWindowVisible(IntPtr hWnd);
+
+        private bool IsGameWindowActive()
         {
-            while (!_cts.Token.IsCancellationRequested)
-            {
-                if (!inputSimulator.IsOpen)
-                {
-                    try
-                    {
-                        inputSimulator.OpenSerialPort();
-                        Debug.WriteLine("COM port opened");
-                    }
-                    catch
-                    {
-                        // игнор, пробуем снова
-                    }
-                }
+            IntPtr hwnd = GetForegroundWindow(); // Получаем дескриптор активного окна
+            StringBuilder windowText = new StringBuilder(255);
+            GetWindowText(hwnd, windowText, 255); // Получаем название активного окна
 
-                await Task.Delay(2000, _cts.Token);
-            }
+            string activeWindowTitle = windowText.ToString();
+
+            // Проверяем, если название окна совпадает с нужным
+            string targetWindowTitle = "Albion Online Client"; // Замените на название игры
+            if (activeWindowTitle.Contains(targetWindowTitle))
+                return true;
+            else
+                return false;
         }
 
         private bool _kmh_KeyDown(int wParam, KBDLLHOOKSTRUCT lParam)
@@ -176,6 +205,27 @@ namespace tser
                         return true;
                     }
                 }
+                if (lParam.vkCode == 0x061 && lowHpHelperRadioButton.Checked && lowHpPlayerHelperActivated)
+                {
+                    RunAsync(_lowHpPlayerHelperHandler.Run);
+
+                    return true;
+                }
+                else if (lParam.vkCode == 0x062 && fastLootRadioButton.Checked)
+                {
+                    var handler = _serviceProvider.GetRequiredService<FastLootHandler>();
+                    RunAsync(handler.Run);
+                    return true;
+                }
+                else if (lParam.vkCode == 0x063 && gateHelperRadioButton.Checked)
+                {
+                    var handler = _serviceProvider.GetRequiredService<GateHelperHandler>();
+                    RunAsync(handler.Run);
+
+                    return true;
+                }
+
+
                 //if (quickFrostCheckBox.Checked &&
                 //    (lParam.vkCode == (int)Keys.Q || lParam.vkCode == 0x419) &&
                 //    spamActivated == false)
@@ -260,7 +310,7 @@ namespace tser
         {
             try
             {
-                if ((lParam.mouseData >> 16) == XBUTTON2)
+                if ((lParam.mouseData >> 16) == XBUTTON2 && (!_debugMode || IsGameWindowActive()))
                 {
                     if (setPositionMode)
                     {
@@ -268,7 +318,25 @@ namespace tser
                         setPositionMode = false;
                         return true;
                     }
-                    else if (buyAndSellRadioButton.Checked)
+
+                    const int VK_CONTROL = 0x11;
+                    bool ctrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+
+                    // With Ctrl
+                    if (ctrlPressed)
+                    {
+                        if (gateHelperRadioButton.Checked)
+                        {
+                            var handler = _serviceProvider.GetRequiredService<GateHelperHandler>();
+                            RunAsync(handler.Run);
+
+                            return true;
+                        }
+                    }
+
+                    // Without modificator
+
+                    if (buyAndSellRadioButton.Checked)
                     {
                         //const int VK_CONTROL = 0x11;
                         //bool ctrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
@@ -289,19 +357,6 @@ namespace tser
                         RunAsync(_spamEHandler.Activate);
                         return true;
                     }
-                    else if (fastLootRadioButton.Checked)
-                    {
-                        var handler = _serviceProvider.GetRequiredService<FastLootHandler>();
-                        RunAsync(handler.Run);
-                        return true;
-                    }
-                    else if (gateHelperRadioButton.Checked)
-                    {
-                        var handler = _serviceProvider.GetRequiredService<GateHelperHandler>();
-                        RunAsync(handler.Run);
-
-                        return true;
-                    }
                     else if (lowHpHelperRadioButton.Checked && lowHpPlayerHelperActivated)
                     {
                         RunAsync(_lowHpPlayerHelperHandler.Run);
@@ -310,7 +365,7 @@ namespace tser
                     }
                 }
 
-                //if ((lParam.mouseData >> 16) == XBUTTON1)
+                //if ((lParam.mouseData >> 16) == XBUTTON1 && IsGameWindowActive())
                 //{
                 //    if (this.WindowState == FormWindowState.Minimized)
                 //        this.WindowState = FormWindowState.Normal;
@@ -327,6 +382,16 @@ namespace tser
                 //    this.Activate();
                 //    return true;
                 //}
+
+                if ((lParam.mouseData >> 16) == XBUTTON1 && IsGameWindowActive())
+                {
+                    if (fastLootRadioButton.Checked)
+                    {
+                        var handler = _serviceProvider.GetRequiredService<FastLootHandler>();
+                        RunAsync(handler.Run);
+                        return true;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -435,7 +500,6 @@ namespace tser
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _cts.Cancel();
             //_regionManager.Save();
         }
 
@@ -466,7 +530,11 @@ namespace tser
         private async void connectButton_Click(object sender, EventArgs e)
         {
             inputSimulator.InitComPort((string)comPortsComboBox.SelectedItem);
-            _ = MonitorPortAsync();
+
+            inputSimulator.OpenSerialPort();
+
+            _isConnected = true;
+            connectButton.Text = "Connected";
         }
 
         private void setGroupPanelPositionButton_Click(object sender, EventArgs e)

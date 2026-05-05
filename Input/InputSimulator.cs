@@ -23,6 +23,13 @@ namespace tser
 
         public void InitComPort(string comPort)
         {
+            if(_serialPort != null)
+            {
+                _serialPort.DataReceived -= OnDataReceived;
+                _serialPort.Close();
+                _serialPort.Dispose();
+            }
+
             _serialPort = new SerialPort(comPort, 115200)
             {
                 DataBits = 8,
@@ -79,6 +86,9 @@ namespace tser
 
         public void LeftButtonClick()
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine("MOUSECLICK 1");
@@ -86,6 +96,9 @@ namespace tser
 
         public void RightButtonClick()
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine("MOUSECLICK 2");
@@ -93,6 +106,9 @@ namespace tser
 
         public void MouseScroll(int value)
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine("MOUSESCROLL " + value);
@@ -100,6 +116,9 @@ namespace tser
 
         public void MouseMove(int dx, int dy)
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine($"MOUSEMOVE {dx} {dy}");
@@ -107,6 +126,9 @@ namespace tser
 
         public void KeyPress(int vkCode)
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine("VKEY " + vkCode);
@@ -114,6 +136,9 @@ namespace tser
 
         public void KeyPress(Keys key)
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine("VKEY " + (int)key);
@@ -121,6 +146,9 @@ namespace tser
 
         public void ShiftDown(Keys key)
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine("SHIFTDOWN");
@@ -128,6 +156,9 @@ namespace tser
 
         public void ShiftUp(Keys key)
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine("SHIFTUP");
@@ -135,6 +166,9 @@ namespace tser
 
         public void SendCommand(string command, params string[] args)
         {
+            if (!_serialPort.IsOpen)
+                return;
+
             //OpenSerialPort();
 
             _serialPort.WriteLine(command + (args != null && args.Length > 0 ? " " + String.Join(" ", args) : ""));

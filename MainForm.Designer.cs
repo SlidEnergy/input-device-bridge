@@ -46,15 +46,19 @@
             openLootWindowCheckBox = new CheckBox();
             fastBuyCheckBox = new CheckBox();
             groupBox1 = new GroupBox();
+            lowHpHelperRadioButton = new RadioButton();
+            setGroupPanelPositionButton = new Button();
             groupBox2 = new GroupBox();
             nameTextBox = new TextBox();
-            setGroupPanelPositionButton = new Button();
             comPortsComboBox = new ComboBox();
             connectButton = new Button();
-            lowHpHelperRadioButton = new RadioButton();
             markerHelperRadioButton = new RadioButton();
+            groupBox3 = new GroupBox();
             ((System.ComponentModel.ISupportInitialize)allowedBestPriceOrderPositionNumericUpDown).BeginInit();
             panel1.SuspendLayout();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
             SuspendLayout();
             // 
             // bootsellButton
@@ -83,7 +87,7 @@
             // 
             buyAndSellRadioButton.AutoSize = true;
             buyAndSellRadioButton.Checked = true;
-            buyAndSellRadioButton.Location = new Point(22, 96);
+            buyAndSellRadioButton.Location = new Point(6, 47);
             buyAndSellRadioButton.Name = "buyAndSellRadioButton";
             buyAndSellRadioButton.Size = new Size(79, 19);
             buyAndSellRadioButton.TabIndex = 3;
@@ -94,7 +98,7 @@
             // spamQRadioButton
             // 
             spamQRadioButton.AutoSize = true;
-            spamQRadioButton.Location = new Point(300, 96);
+            spamQRadioButton.Location = new Point(6, 137);
             spamQRadioButton.Name = "spamQRadioButton";
             spamQRadioButton.Size = new Size(67, 19);
             spamQRadioButton.TabIndex = 4;
@@ -104,7 +108,7 @@
             // noneRadioButton
             // 
             noneRadioButton.AutoSize = true;
-            noneRadioButton.Location = new Point(12, 48);
+            noneRadioButton.Location = new Point(6, 22);
             noneRadioButton.Name = "noneRadioButton";
             noneRadioButton.Size = new Size(54, 19);
             noneRadioButton.TabIndex = 5;
@@ -114,7 +118,7 @@
             // numPadCheckBox
             // 
             numPadCheckBox.AutoSize = true;
-            numPadCheckBox.Location = new Point(40, 146);
+            numPadCheckBox.Location = new Point(24, 97);
             numPadCheckBox.Name = "numPadCheckBox";
             numPadCheckBox.Size = new Size(116, 19);
             numPadCheckBox.TabIndex = 8;
@@ -124,7 +128,7 @@
             // spamERadioButton
             // 
             spamERadioButton.AutoSize = true;
-            spamERadioButton.Location = new Point(300, 121);
+            spamERadioButton.Location = new Point(6, 162);
             spamERadioButton.Name = "spamERadioButton";
             spamERadioButton.Size = new Size(64, 19);
             spamERadioButton.TabIndex = 9;
@@ -133,7 +137,7 @@
             // 
             // allowedBestPriceOrderPositionNumericUpDown
             // 
-            allowedBestPriceOrderPositionNumericUpDown.Location = new Point(233, 166);
+            allowedBestPriceOrderPositionNumericUpDown.Location = new Point(217, 117);
             allowedBestPriceOrderPositionNumericUpDown.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
             allowedBestPriceOrderPositionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             allowedBestPriceOrderPositionNumericUpDown.Name = "allowedBestPriceOrderPositionNumericUpDown";
@@ -144,7 +148,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(43, 168);
+            label1.Location = new Point(27, 119);
             label1.Name = "label1";
             label1.Size = new Size(184, 15);
             label1.TabIndex = 11;
@@ -153,10 +157,12 @@
             // fastLootRadioButton
             // 
             fastLootRadioButton.AutoSize = true;
-            fastLootRadioButton.Location = new Point(300, 146);
+            fastLootRadioButton.Checked = true;
+            fastLootRadioButton.Location = new Point(6, 22);
             fastLootRadioButton.Name = "fastLootRadioButton";
             fastLootRadioButton.Size = new Size(70, 19);
             fastLootRadioButton.TabIndex = 13;
+            fastLootRadioButton.TabStop = true;
             fastLootRadioButton.Text = "Fast loot";
             fastLootRadioButton.UseVisualStyleBackColor = true;
             // 
@@ -196,10 +202,12 @@
             // gateHelperRadioButton
             // 
             gateHelperRadioButton.AutoSize = true;
-            gateHelperRadioButton.Location = new Point(300, 253);
+            gateHelperRadioButton.Checked = true;
+            gateHelperRadioButton.Location = new Point(6, 22);
             gateHelperRadioButton.Name = "gateHelperRadioButton";
             gateHelperRadioButton.Size = new Size(85, 19);
             gateHelperRadioButton.TabIndex = 18;
+            gateHelperRadioButton.TabStop = true;
             gateHelperRadioButton.Text = "Gate helper";
             gateHelperRadioButton.UseVisualStyleBackColor = true;
             gateHelperRadioButton.CheckedChanged += gateHelperRadioButton_CheckedChanged;
@@ -209,9 +217,9 @@
             panel1.Controls.Add(openLootWindowCheckBox);
             panel1.Controls.Add(allLootStrategyRadioButton);
             panel1.Controls.Add(bestLootStrategyRadioButton);
-            panel1.Location = new Point(318, 171);
+            panel1.Location = new Point(24, 47);
             panel1.Name = "panel1";
-            panel1.Size = new Size(224, 76);
+            panel1.Size = new Size(220, 76);
             panel1.TabIndex = 19;
             // 
             // openLootWindowCheckBox
@@ -228,7 +236,7 @@
             // fastBuyCheckBox
             // 
             fastBuyCheckBox.AutoSize = true;
-            fastBuyCheckBox.Location = new Point(40, 121);
+            fastBuyCheckBox.Location = new Point(24, 72);
             fastBuyCheckBox.Name = "fastBuyCheckBox";
             fastBuyCheckBox.Size = new Size(170, 19);
             fastBuyCheckBox.TabIndex = 20;
@@ -238,39 +246,63 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(noneRadioButton);
+            groupBox1.Controls.Add(label1);
+            groupBox1.Controls.Add(allowedBestPriceOrderPositionNumericUpDown);
+            groupBox1.Controls.Add(fastBuyCheckBox);
+            groupBox1.Controls.Add(lowHpHelperRadioButton);
+            groupBox1.Controls.Add(numPadCheckBox);
+            groupBox1.Controls.Add(buyAndSellRadioButton);
+            groupBox1.Controls.Add(setGroupPanelPositionButton);
+            groupBox1.Controls.Add(spamERadioButton);
+            groupBox1.Controls.Add(spamQRadioButton);
             groupBox1.Location = new Point(12, 73);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(272, 341);
+            groupBox1.Size = new Size(272, 312);
             groupBox1.TabIndex = 21;
             groupBox1.TabStop = false;
-            groupBox1.Text = "Market";
+            groupBox1.Text = "Back mouse key";
             // 
-            // groupBox2
+            // lowHpHelperRadioButton
             // 
-            groupBox2.Location = new Point(290, 73);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(254, 341);
-            groupBox2.TabIndex = 22;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Battle";
-            // 
-            // nameTextBox
-            // 
-            nameTextBox.Location = new Point(318, 354);
-            nameTextBox.Name = "nameTextBox";
-            nameTextBox.Size = new Size(100, 23);
-            nameTextBox.TabIndex = 1;
-            nameTextBox.TextChanged += nameTextBox_TextChanged;
+            lowHpHelperRadioButton.AutoSize = true;
+            lowHpHelperRadioButton.Location = new Point(6, 187);
+            lowHpHelperRadioButton.Name = "lowHpHelperRadioButton";
+            lowHpHelperRadioButton.Size = new Size(100, 19);
+            lowHpHelperRadioButton.TabIndex = 27;
+            lowHpHelperRadioButton.TabStop = true;
+            lowHpHelperRadioButton.Text = "Low hp helper";
+            lowHpHelperRadioButton.UseVisualStyleBackColor = true;
+            lowHpHelperRadioButton.CheckedChanged += lowHpHelperRadioButton_CheckedChanged;
             // 
             // setGroupPanelPositionButton
             // 
-            setGroupPanelPositionButton.Location = new Point(318, 303);
+            setGroupPanelPositionButton.Location = new Point(24, 213);
             setGroupPanelPositionButton.Name = "setGroupPanelPositionButton";
             setGroupPanelPositionButton.Size = new Size(149, 23);
             setGroupPanelPositionButton.TabIndex = 1;
             setGroupPanelPositionButton.Text = "Set Group Panel Position";
             setGroupPanelPositionButton.UseVisualStyleBackColor = true;
             setGroupPanelPositionButton.Click += setGroupPanelPositionButton_Click;
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(fastLootRadioButton);
+            groupBox2.Controls.Add(panel1);
+            groupBox2.Location = new Point(294, 73);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(250, 134);
+            groupBox2.TabIndex = 22;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Forward mouse key";
+            // 
+            // nameTextBox
+            // 
+            nameTextBox.Location = new Point(398, 289);
+            nameTextBox.Name = "nameTextBox";
+            nameTextBox.Size = new Size(100, 23);
+            nameTextBox.TabIndex = 1;
+            nameTextBox.TextChanged += nameTextBox_TextChanged;
             // 
             // comPortsComboBox
             // 
@@ -290,55 +322,40 @@
             connectButton.UseVisualStyleBackColor = true;
             connectButton.Click += connectButton_Click;
             // 
-            // lowHpHelperRadioButton
-            // 
-            lowHpHelperRadioButton.AutoSize = true;
-            lowHpHelperRadioButton.Location = new Point(300, 277);
-            lowHpHelperRadioButton.Name = "lowHpHelperRadioButton";
-            lowHpHelperRadioButton.Size = new Size(100, 19);
-            lowHpHelperRadioButton.TabIndex = 27;
-            lowHpHelperRadioButton.TabStop = true;
-            lowHpHelperRadioButton.Text = "Low hp helper";
-            lowHpHelperRadioButton.UseVisualStyleBackColor = true;
-            lowHpHelperRadioButton.CheckedChanged += lowHpHelperRadioButton_CheckedChanged;
-            // 
             // markerHelperRadioButton
             // 
             markerHelperRadioButton.AutoSize = true;
-            markerHelperRadioButton.Location = new Point(300, 329);
+            markerHelperRadioButton.Location = new Point(294, 290);
             markerHelperRadioButton.Name = "markerHelperRadioButton";
             markerHelperRadioButton.Size = new Size(98, 19);
-            markerHelperRadioButton.TabIndex = 28;
+            markerHelperRadioButton.TabIndex = 25;
             markerHelperRadioButton.TabStop = true;
             markerHelperRadioButton.Text = "Marker helper";
             markerHelperRadioButton.UseVisualStyleBackColor = true;
-            markerHelperRadioButton.CheckedChanged += markerHelperRadioButton_CheckedChanged;
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(gateHelperRadioButton);
+            groupBox3.Location = new Point(294, 213);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(250, 66);
+            groupBox3.TabIndex = 26;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Ctrl + Forward mouse key";
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(556, 455);
+            Controls.Add(groupBox3);
             Controls.Add(markerHelperRadioButton);
-            Controls.Add(lowHpHelperRadioButton);
             Controls.Add(nameTextBox);
-            Controls.Add(setGroupPanelPositionButton);
             Controls.Add(connectButton);
             Controls.Add(comPortsComboBox);
-            Controls.Add(spamQRadioButton);
-            Controls.Add(spamERadioButton);
-            Controls.Add(fastLootRadioButton);
-            Controls.Add(panel1);
-            Controls.Add(gateHelperRadioButton);
-            Controls.Add(buyAndSellRadioButton);
-            Controls.Add(numPadCheckBox);
-            Controls.Add(fastBuyCheckBox);
-            Controls.Add(allowedBestPriceOrderPositionNumericUpDown);
             Controls.Add(groupBox2);
-            Controls.Add(label1);
             Controls.Add(groupBox1);
             Controls.Add(regionManagerButton);
-            Controls.Add(noneRadioButton);
             Controls.Add(testButton);
             Controls.Add(bootsellButton);
             Name = "MainForm";
@@ -349,6 +366,12 @@
             ((System.ComponentModel.ISupportInitialize)allowedBestPriceOrderPositionNumericUpDown).EndInit();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -379,5 +402,6 @@
         private TextBox nameTextBox;
         private RadioButton lowHpHelperRadioButton;
         private RadioButton markerHelperRadioButton;
+        private GroupBox groupBox3;
     }
 }

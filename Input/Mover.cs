@@ -222,8 +222,20 @@ namespace tser
 
             double distance = Math.Sqrt(dx * dx + dy * dy);
 
-            int duration = Math.Clamp((int)(distance * 1.0), 10, 30);
-            int steps = Math.Clamp(duration / 5, 4, 20);
+            //// пикселей в миллисекунду
+            //double speed = 12;
+
+            //// итоговое время движения
+            //int duration = Math.Max((int)(distance / speed), 1);
+
+            // шаг каждые 2 мс
+            int stepDelay = 1;
+
+            //// количество шагов зависит только от времени
+            //int steps = Math.Max(duration / stepDelay, 1);
+
+            int duration = Math.Clamp((int)(distance * 1.0), 10, 40);
+            int steps = Math.Clamp(duration, 4, 30);
 
             double accX = 0;
             double accY = 0;
@@ -252,7 +264,8 @@ namespace tser
 
                 _sim.MouseMove((int)Math.Round(stepX), (int)Math.Round(stepY));
 
-                Thread.Sleep(duration / steps);
+                //Thread.Sleep(duration / steps);
+                Thread.Sleep(stepDelay);
             }
         }
 
