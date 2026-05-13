@@ -13,5 +13,7 @@ namespace tser
         public bool OpenLootWindow { get; set; }
 
         public string Name { get; set; }
+
+        public bool HightPriorityForFirst { get; set; }
     }
 }

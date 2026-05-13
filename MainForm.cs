@@ -9,6 +9,11 @@ using System.Management;
 using System.IO.Ports;
 using OpenCvSharp.ML;
 using System.Text;
+using Windows.Graphics.Capture;
+using tser.Wgc;
+using System.Text.RegularExpressions;
+using Microsoft.UI.Xaml.Controls;
+using OpenCvSharp;
 
 namespace tser
 {
@@ -122,7 +127,8 @@ namespace tser
 
         private async void Form1_Shown(object sender, EventArgs e)
         {
-
+            await _mapManager.Load();
+            StartWatching();
         }
 
         //private CancellationTokenSource _cts = new();
@@ -205,25 +211,25 @@ namespace tser
                         return true;
                     }
                 }
-                if (lParam.vkCode == 0x061 && lowHpHelperRadioButton.Checked && lowHpPlayerHelperActivated)
-                {
-                    RunAsync(_lowHpPlayerHelperHandler.Run);
+                //if (lParam.vkCode == 0x061 && lowHpHelperRadioButton.Checked && lowHpPlayerHelperActivated)
+                //{
+                //    RunAsync(_lowHpPlayerHelperHandler.Run);
 
-                    return true;
-                }
-                else if (lParam.vkCode == 0x062 && fastLootRadioButton.Checked)
-                {
-                    var handler = _serviceProvider.GetRequiredService<FastLootHandler>();
-                    RunAsync(handler.Run);
-                    return true;
-                }
-                else if (lParam.vkCode == 0x063 && gateHelperRadioButton.Checked)
-                {
-                    var handler = _serviceProvider.GetRequiredService<GateHelperHandler>();
-                    RunAsync(handler.Run);
+                //    return true;
+                //}
+                //else if (lParam.vkCode == 0x062 && fastLootRadioButton.Checked)
+                //{
+                //    var handler = _serviceProvider.GetRequiredService<FastLootHandler>();
+                //    RunAsync(handler.Run);
+                //    return true;
+                //}
+                //else if (lParam.vkCode == 0x063 && gateHelperRadioButton.Checked)
+                //{
+                //    var handler = _serviceProvider.GetRequiredService<GateHelperHandler>();
+                //    RunAsync(handler.Run);
 
-                    return true;
-                }
+                //    return true;
+                //}
 
 
                 //if (quickFrostCheckBox.Checked &&
@@ -310,6 +316,9 @@ namespace tser
         {
             try
             {
+                const int VK_CONTROL = 0x11;
+                bool ctrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+
                 if ((lParam.mouseData >> 16) == XBUTTON2 && (!_debugMode || IsGameWindowActive()))
                 {
                     if (setPositionMode)
@@ -318,9 +327,6 @@ namespace tser
                         setPositionMode = false;
                         return true;
                     }
-
-                    const int VK_CONTROL = 0x11;
-                    bool ctrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
 
                     // With Ctrl
                     if (ctrlPressed)
@@ -385,6 +391,17 @@ namespace tser
 
                 if ((lParam.mouseData >> 16) == XBUTTON1 && IsGameWindowActive())
                 {
+                    // With Ctrl
+                    if (ctrlPressed)
+                    {
+                        if (markerHelperRadioButton.Checked)
+                        {
+                            RunAsync(_markerHelperHandler.Run);
+
+                            return true;
+                        }
+                    }
+
                     if (fastLootRadioButton.Checked)
                     {
                         var handler = _serviceProvider.GetRequiredService<FastLootHandler>();
@@ -452,6 +469,7 @@ namespace tser
 
             inputSimulator?.Dispose();
             //_serialReader?.Dispose();
+            StopWatching();
 
             base.OnFormClosing(e);
         }
@@ -468,22 +486,20 @@ namespace tser
             inputSimulator.SendCommand("BOOTSELL 1 1");
         }
 
-        private void testButton_Click(object sender, EventArgs e)
+        private async void testButton_Click(object sender, EventArgs e)
         {
-            RunAsync(async (HandlerContext context) =>
-            {
-                //var cursor = Cursor.Position;
 
-                //context.SynchronizationContext.Post(_ =>
-                //{
-                //    var form = new GateHelperForm(_mapManager);
-                //    form.StartPosition = FormStartPosition.Manual;
-                //    form.Location = new Point(cursor.X + 20, cursor.Y + 20);
-                //    form.SetText("test text title");
-                //    form.Show();
-                //    form.InitAutoClose(Cursor.Position);
-                //}, null);
-            });
+
+            //context.SynchronizationContext.Post(_ =>
+            //{
+            //    var form = new GateHelperForm(_mapManager);
+            //    form.StartPosition = FormStartPosition.Manual;
+            //    form.Location = new Point(cursor.X + 20, cursor.Y + 20);
+            //    form.SetText("test text title");
+            //    form.Show();
+            //    form.InitAutoClose(Cursor.Position);
+            //}, null);
+            //});
         }
 
         private void lootAllCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -586,6 +602,43 @@ namespace tser
         private void nameTextBox_TextChanged(object sender, EventArgs e)
         {
             _settings.BattleSettings.Name = nameTextBox.Text;
+        }
+
+        private void initMarkerHelperButton_Click(object sender, EventArgs e)
+        {
+            var hwnd = WgcBootstrap.FindWindow(null, "Albion Online Client");
+
+            var item = WgcBootstrap.CreateItemForWindow(hwnd);
+
+            //var device = WgcBootstrap.CreateDevice();
+
+            var d3dDevice = new SharpDX.Direct3D11.Device(
+                    SharpDX.Direct3D.DriverType.Hardware,
+                SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport);
+
+            var device = Direct3D11Helper.CreateDevice(d3dDevice);
+
+            if (device == null)
+                throw new InvalidOperationException("Failed to create D3D11 device");
+
+            var capture = new WgcCapture();
+            capture.Start(item, device, d3dDevice);
+
+            //await Task.Delay(1000);
+            //var frame = capture.GetFrame();
+
+            //var frame = await capture.WaitForFrame(capture);
+            //if (frame == null)
+            //    throw new TimeoutException("No frame captured within timeout");
+
+            //Cv2.ImShow("debug", frame);
+
+            _markerHelperHandler.SetCapture(capture);
+        }
+
+        private void hightPriorityCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            _settings.BattleSettings.HightPriorityForFirst = hightPriorityCheckBox.Checked;
         }
     }
 }

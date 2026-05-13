@@ -36,6 +36,81 @@ namespace tser
             AddTemplate(nameof(FastLootHandler), "Broken6", "assets/templates/ru/wide/loot_broken6.png");
             AddTemplate(nameof(FastLootHandler), "Broken7", "assets/templates/ru/wide/loot_broken7.png");
             AddTemplate(nameof(FastLootHandler), "Broken8", "assets/templates/ru/wide/loot_broken8.png");
+
+            AddTemplate("chars", "0", "assets/templates/chars/wide/48.png");
+            AddTemplate("chars", "1", "assets/templates/chars/wide/49.png");
+            AddTemplate("chars", "2", "assets/templates/chars/wide/50.png");
+            AddTemplate("chars", "3", "assets/templates/chars/wide/51.png");
+            AddTemplate("chars", "4", "assets/templates/chars/wide/52.png");
+            AddTemplate("chars", "5", "assets/templates/chars/wide/53.png");
+            AddTemplate("chars", "6", "assets/templates/chars/wide/54.png");
+            AddTemplate("chars", "7", "assets/templates/chars/wide/55.png");
+            AddTemplate("chars", "8", "assets/templates/chars/wide/56.png");
+            AddTemplate("chars", "9", "assets/templates/chars/wide/57.png");
+
+            AddTemplate("chars", "A", "assets/templates/chars/wide/65.png");
+            AddTemplate("chars", "B", "assets/templates/chars/wide/66.png");
+            AddTemplate("chars", "C", "assets/templates/chars/wide/67.png");
+            AddTemplate("chars", "D", "assets/templates/chars/wide/68.png");
+            AddTemplate("chars", "E", "assets/templates/chars/wide/69.png");
+            AddTemplate("chars", "F", "assets/templates/chars/wide/70.png");
+            AddTemplate("chars", "G", "assets/templates/chars/wide/71.png");
+            AddTemplate("chars", "H", "assets/templates/chars/wide/72.png");
+            AddTemplate("chars", "I", "assets/templates/chars/wide/73.png");
+            AddTemplate("chars", "J", "assets/templates/chars/wide/74.png");
+
+            AddTemplate("chars", "K", "assets/templates/chars/wide/75.png");
+            AddTemplate("chars", "L", "assets/templates/chars/wide/76.png");
+            AddTemplate("chars", "M", "assets/templates/chars/wide/77.png");
+            AddTemplate("chars", "N", "assets/templates/chars/wide/78.png");
+            AddTemplate("chars", "O", "assets/templates/chars/wide/79.png");
+            AddTemplate("chars", "P", "assets/templates/chars/wide/80.png");
+            AddTemplate("chars", "Q", "assets/templates/chars/wide/81.png");
+            AddTemplate("chars", "R", "assets/templates/chars/wide/82.png");
+            AddTemplate("chars", "S", "assets/templates/chars/wide/83.png");
+            AddTemplate("chars", "T", "assets/templates/chars/wide/84.png");
+            AddTemplate("chars", "U", "assets/templates/chars/wide/85.png");
+            AddTemplate("chars", "V", "assets/templates/chars/wide/86.png");
+            AddTemplate("chars", "W", "assets/templates/chars/wide/87.png");
+            AddTemplate("chars", "X", "assets/templates/chars/wide/88.png");
+            AddTemplate("chars", "Y", "assets/templates/chars/wide/89.png");
+            AddTemplate("chars", "Z", "assets/templates/chars/wide/90.png");
+
+            AddTemplate("chars", "a", "assets/templates/chars/wide/97.png");
+            AddTemplate("chars", "b", "assets/templates/chars/wide/98.png");
+            AddTemplate("chars", "c", "assets/templates/chars/wide/99.png");
+            AddTemplate("chars", "d", "assets/templates/chars/wide/100.png");
+            AddTemplate("chars", "e", "assets/templates/chars/wide/101.png");
+            AddTemplate("chars", "f", "assets/templates/chars/wide/102.png");
+            AddTemplate("chars", "g", "assets/templates/chars/wide/103.png");
+            AddTemplate("chars", "h", "assets/templates/chars/wide/104.png");
+            AddTemplate("chars", "i", "assets/templates/chars/wide/105.png");
+            AddTemplate("chars", "j", "assets/templates/chars/wide/106.png");
+            AddTemplate("chars", "k", "assets/templates/chars/wide/107.png");
+            AddTemplate("chars", "l", "assets/templates/chars/wide/108.png");
+            AddTemplate("chars", "m", "assets/templates/chars/wide/109.png");
+            AddTemplate("chars", "n", "assets/templates/chars/wide/110.png");
+            AddTemplate("chars", "o", "assets/templates/chars/wide/111.png");
+            AddTemplate("chars", "p", "assets/templates/chars/wide/112.png");
+            AddTemplate("chars", "q", "assets/templates/chars/wide/113.png");
+            AddTemplate("chars", "r", "assets/templates/chars/wide/114.png");
+            AddTemplate("chars", "s", "assets/templates/chars/wide/115.png");
+            AddTemplate("chars", "t", "assets/templates/chars/wide/116.png");
+            AddTemplate("chars", "u", "assets/templates/chars/wide/117.png");
+            AddTemplate("chars", "v", "assets/templates/chars/wide/118.png");
+            AddTemplate("chars", "w", "assets/templates/chars/wide/119.png");
+            AddTemplate("chars", "x", "assets/templates/chars/wide/120.png");
+            AddTemplate("chars", "y", "assets/templates/chars/wide/121.png");
+            AddTemplate("chars", "z", "assets/templates/chars/wide/122.png");
+
+            //for (int i = 48; i <= 57; i++)
+            //    AddTemplate("chars", ((char)i).ToString(), $"assets/templates/chars/wide/{i}.png");
+
+            //for (int i = 65; i <= 90; i++)
+            //    AddTemplate("chars", ((char)i).ToString(), $"assets/templates/chars/wide/{i}.png");
+
+            //for (int i = 97; i <= 122; i++)
+            //    AddTemplate("chars", ((char)i).ToString(), $"assets/templates/chars/wide/{i}.png");
         }
 
         public Dictionary<string, Mat> GetTemplates(string setName)

@@ -54,11 +54,15 @@
             connectButton = new Button();
             markerHelperRadioButton = new RadioButton();
             groupBox3 = new GroupBox();
+            groupBox4 = new GroupBox();
+            initMarkerHelperButton = new Button();
+            hightPriorityCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)allowedBestPriceOrderPositionNumericUpDown).BeginInit();
             panel1.SuspendLayout();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
+            groupBox4.SuspendLayout();
             SuspendLayout();
             // 
             // bootsellButton
@@ -246,6 +250,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(hightPriorityCheckBox);
             groupBox1.Controls.Add(noneRadioButton);
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(allowedBestPriceOrderPositionNumericUpDown);
@@ -298,7 +303,7 @@
             // 
             // nameTextBox
             // 
-            nameTextBox.Location = new Point(398, 289);
+            nameTextBox.Location = new Point(110, 18);
             nameTextBox.Name = "nameTextBox";
             nameTextBox.Size = new Size(100, 23);
             nameTextBox.TabIndex = 1;
@@ -325,32 +330,66 @@
             // markerHelperRadioButton
             // 
             markerHelperRadioButton.AutoSize = true;
-            markerHelperRadioButton.Location = new Point(294, 290);
+            markerHelperRadioButton.Location = new Point(6, 22);
             markerHelperRadioButton.Name = "markerHelperRadioButton";
             markerHelperRadioButton.Size = new Size(98, 19);
             markerHelperRadioButton.TabIndex = 25;
             markerHelperRadioButton.TabStop = true;
             markerHelperRadioButton.Text = "Marker helper";
             markerHelperRadioButton.UseVisualStyleBackColor = true;
+            markerHelperRadioButton.CheckedChanged += markerHelperRadioButton_CheckedChanged;
             // 
             // groupBox3
             // 
             groupBox3.Controls.Add(gateHelperRadioButton);
+            groupBox3.ForeColor = SystemColors.ControlText;
             groupBox3.Location = new Point(294, 213);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(250, 66);
             groupBox3.TabIndex = 26;
             groupBox3.TabStop = false;
-            groupBox3.Text = "Ctrl + Forward mouse key";
+            groupBox3.Text = "Ctrl + Back mouse key";
+            // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(initMarkerHelperButton);
+            groupBox4.Controls.Add(markerHelperRadioButton);
+            groupBox4.Controls.Add(nameTextBox);
+            groupBox4.Location = new Point(294, 286);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Size = new Size(250, 99);
+            groupBox4.TabIndex = 27;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "Ctrl + Forward mouse key";
+            // 
+            // initMarkerHelperButton
+            // 
+            initMarkerHelperButton.Location = new Point(44, 47);
+            initMarkerHelperButton.Name = "initMarkerHelperButton";
+            initMarkerHelperButton.Size = new Size(75, 23);
+            initMarkerHelperButton.TabIndex = 26;
+            initMarkerHelperButton.Text = "Init";
+            initMarkerHelperButton.UseVisualStyleBackColor = true;
+            initMarkerHelperButton.Click += initMarkerHelperButton_Click;
+            // 
+            // hightPriorityCheckBox
+            // 
+            hightPriorityCheckBox.AutoSize = true;
+            hightPriorityCheckBox.Location = new Point(27, 242);
+            hightPriorityCheckBox.Name = "hightPriorityCheckBox";
+            hightPriorityCheckBox.Size = new Size(138, 19);
+            hightPriorityCheckBox.TabIndex = 28;
+            hightPriorityCheckBox.Text = "Hight priority for first";
+            hightPriorityCheckBox.UseVisualStyleBackColor = true;
+            hightPriorityCheckBox.CheckedChanged += hightPriorityCheckBox_CheckedChanged;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(556, 455);
+            Controls.Add(groupBox4);
             Controls.Add(groupBox3);
-            Controls.Add(markerHelperRadioButton);
-            Controls.Add(nameTextBox);
             Controls.Add(connectButton);
             Controls.Add(comPortsComboBox);
             Controls.Add(groupBox2);
@@ -372,8 +411,9 @@
             groupBox2.PerformLayout();
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
+            groupBox4.ResumeLayout(false);
+            groupBox4.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -403,5 +443,8 @@
         private RadioButton lowHpHelperRadioButton;
         private RadioButton markerHelperRadioButton;
         private GroupBox groupBox3;
+        private GroupBox groupBox4;
+        private Button initMarkerHelperButton;
+        private CheckBox hightPriorityCheckBox;
     }
 }

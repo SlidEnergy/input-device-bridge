@@ -111,7 +111,7 @@ namespace tser
 
                         using var cropped = new OpenCvSharp.Mat(mat, new OpenCvSharp.Rect(hpBarRect.X, hpBarRect.Y, hpBarRect.Width, hpBarRect.Height));
 
-                        //OpenCvSharp.Cv2.ImWrite("hp_debug.png", cropped);
+                        //OpenCvSharp.Cv2.ImWrite("hp_debug" + rowIndex + ".png", cropped);
 
                         var hp = GetHp(mat, hpBarRect);
 
@@ -146,15 +146,16 @@ namespace tser
 
         private int GetMinHpIndex(double[] hp)
         {
-
             var min = 1.0d;
             var minIndex = -1;
 
             for (int i = 0; i < _count; i++)
             {
-                if (hp[i] < min && hp[i] >= _lowLimit)
+                var multiplier = settings.BattleSettings.HightPriorityForFirst ? 1.5 : 1;
+
+                if (hp[i] * multiplier < min && hp[i] >= _lowLimit)
                 {
-                    min = hp[i];
+                    min = hp[i] * multiplier;
                     minIndex = i;
                 }
             }
@@ -355,7 +356,14 @@ namespace tser
         public async Task Run(HandlerContext context)
         {
             if (LowHpIndex >= 0)
-                sim.KeyPress((Keys)((int)Keys.D0 + LowHpIndex + 1));
+            {
+                if (LowHpIndex > 0 && LowHpIndex < 9)
+                    sim.KeyPress((Keys)((int)Keys.D1 + LowHpIndex));
+                else if(LowHpIndex == 9 )
+                    sim.KeyPress((Keys)((int)Keys.D0));
+                else if(LowHpIndex > 9 && LowHpIndex < 20)
+                    sim.KeyPress((Keys)((int)Keys.F1 + LowHpIndex - 10));
+            }
         }
 
         private unsafe (byte r, byte g, byte b) GetPixel(OpenCvSharp.Mat mat, int x, int y)

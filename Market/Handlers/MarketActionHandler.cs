@@ -39,7 +39,7 @@ namespace tser
 
         public async Task Run(HandlerContext context)
         { 
-            var detected = analyzer.DetectCurrentWindow(_mainTextRegion, nameof(MarketActionHandler));
+            var detected = analyzer.DetectCurrentTemplate(_mainTextRegion, nameof(MarketActionHandler));
 
             switch (detected)
             {

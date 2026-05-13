@@ -33,7 +33,7 @@ namespace tser
 
             await Task.Delay(500);
 
-            var result = _analyzer.DetectCurrentWindow(qualityScreen.SelectRegion, nameof(NewBuyOrderHandler));
+            var result = _analyzer.DetectCurrentTemplate(qualityScreen.SelectRegion, nameof(NewBuyOrderHandler));
 
             if (result == null)
                 return;

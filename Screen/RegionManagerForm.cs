@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -157,7 +158,7 @@ namespace tser
                 regionListBox.Items.Clear();
                 regionListBox.Items.AddRange(regions.Keys.ToArray());
 
-                if(regions.Count > 0)
+                if (regions.Count > 0)
                     regionListBox.SelectedIndex = 0;
             }
         }
@@ -173,7 +174,7 @@ namespace tser
             regionListBox.Items.Clear();
             regionListBox.Items.AddRange(regions.Keys.ToArray());
 
-            if(regions.Count > 0)
+            if (regions.Count > 0)
                 regionListBox.SelectedIndex = 0;
         }
 
@@ -227,6 +228,33 @@ namespace tser
 
             // сохраняем
             bmp.Save(path, System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        private async void createAlphabetTemplateButton_Click(object sender, EventArgs e)
+        {
+            if (SelectedScreenshot == null || SelectedRegion == null)
+                return;
+
+            var sourceImage = screenshotCanvas1.Image;
+
+            var regions = screenshotCanvas1.Regions;
+
+            if (!regions.ContainsKey(SelectedRegion))
+                return;
+
+            var rect = regions[SelectedRegion].Rect;
+
+            // вырезаем
+            using var bmp = new Bitmap(rect.Width, rect.Height);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.DrawImage(sourceImage,
+                    new Rectangle(0, 0, bmp.Width, bmp.Height),
+                    rect,
+                    GraphicsUnit.Pixel);
+            }
+
+            await AlphabetTemplateCreator.Parse(BitmapConverter.ToMat(bmp), SelectedRegion);
         }
     }
 }

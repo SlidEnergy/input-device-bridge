@@ -74,7 +74,7 @@ namespace tser
                         int row = i / 4;
                         int column = i % 4;
 
-                        var result = _analyzer.DetectCurrentWindow(new Rectangle(screen.CellPoint.X + screen.CellOffset * column, screen.CellPoint.Y + screen.CellOffset * row,
+                        var result = _analyzer.DetectCurrentTemplate(new Rectangle(screen.CellPoint.X + screen.CellOffset * column, screen.CellPoint.Y + screen.CellOffset * row,
                             screen.CellTemplateSize, screen.CellTemplateSize), nameof(FastLootHandler));
 
                         if (result == "Empty2")
@@ -86,7 +86,7 @@ namespace tser
                         await mover.MoveAndClick(new Rectangle(screen.ClickCellPoint.X + screen.CellOffset * column, screen.ClickCellPoint.Y + screen.CellOffset * row,
                             screen.CellClickSize, screen.CellClickSize));
 
-                        if (_analyzer.DetectCurrentWindow(screen.LootTitle, nameof(FastLootHandler) + "_Title") == null)
+                        if (_analyzer.DetectCurrentTemplate(screen.LootTitle, nameof(FastLootHandler) + "_Title") == null)
                             break;
                     }
                 }

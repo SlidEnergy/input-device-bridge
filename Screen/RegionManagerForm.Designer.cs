@@ -33,6 +33,7 @@
             createTemplateButton = new Button();
             regionListBox = new ListBox();
             screenshotListBox = new ListBox();
+            createAlphabetTemplateButton = new Button();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -48,6 +49,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(createAlphabetTemplateButton);
             panel1.Controls.Add(createTemplateButton);
             panel1.Controls.Add(regionListBox);
             panel1.Controls.Add(screenshotListBox);
@@ -92,6 +94,16 @@
             screenshotListBox.TabIndex = 1;
             screenshotListBox.SelectedIndexChanged += screenshotListBox_SelectedIndexChanged;
             // 
+            // createAlphabetTemplateButton
+            // 
+            createAlphabetTemplateButton.Location = new Point(1231, 129);
+            createAlphabetTemplateButton.Name = "createAlphabetTemplateButton";
+            createAlphabetTemplateButton.Size = new Size(113, 23);
+            createAlphabetTemplateButton.TabIndex = 4;
+            createAlphabetTemplateButton.Text = "Create alphabet";
+            createAlphabetTemplateButton.UseVisualStyleBackColor = true;
+            createAlphabetTemplateButton.Click += createAlphabetTemplateButton_Click;
+            // 
             // RegionManagerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -113,5 +125,6 @@
         private ListBox regionListBox;
         private ListBox screenshotListBox;
         private Button createTemplateButton;
+        private Button createAlphabetTemplateButton;
     }
 }

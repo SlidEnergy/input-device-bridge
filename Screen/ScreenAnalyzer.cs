@@ -42,7 +42,7 @@ namespace tser
             textOcr.DefaultPageSegMode = PageSegMode.SingleLine;
         }
 
-        public string? DetectCurrentWindow(Rectangle region, string source)
+        public string? DetectCurrentTemplate(Rectangle region, string source)
         {
             var templates = _templateManager.GetTemplates(source);
 
@@ -116,7 +116,7 @@ namespace tser
             if (mat.Type() != MatType.CV_8U)
                 mat.ConvertTo(mat, MatType.CV_8U);
 
-            Cv2.ImWrite("debug_region.png", mat);
+            //Cv2.ImWrite("debug_region.png", mat);
 
             // Возвращаем готовый Mat (копия, не зависящая от using)
             return mat;
