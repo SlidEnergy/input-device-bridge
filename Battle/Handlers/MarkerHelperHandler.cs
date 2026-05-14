@@ -18,6 +18,7 @@ using tser.Battle.Maps;
 using System.Threading.Tasks;
 using System.Threading;
 using tser.Screen;
+using SharpDX.DXGI;
 
 namespace tser
 {
@@ -74,32 +75,6 @@ namespace tser
             _cts?.Cancel();
             return Task.CompletedTask;
         }
-
-
-
-        //public async Task WaitForCaptureToCompleteAsync(WgcCapture capture, GraphicsCaptureItem item, IDirect3DDevice device)
-        //{
-        //    var tcs = new TaskCompletionSource();
-
-        //    context.SynchronizationContext.Post(_ =>
-        //    {
-        //        try
-        //        {
-        //            capture.Start(item, device);
-
-        //            // Сигнализируем, что работа завершена
-        //            tcs.TrySetResult();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            // Сигнализируем об ошибке
-        //            tcs.TrySetException(ex);
-        //        }
-        //    }, null);
-
-        //    // Ждём завершения
-        //    await tcs.Task;
-        //}
 
         WgcCapture _capture;
 
@@ -259,25 +234,8 @@ namespace tser
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
             ocr.DefaultPageSegMode = PageSegMode.SingleLine;
 
-            //var capture = new WgcCapture();
-
-
-
             try
             {
-                // ===== LAYER 1 =====
-                //var hwnd = WgcBootstrap.FindWindow(null, "Albion Online Client");
-                //var hwnd = WgcBootstrap.FindWindow(null, "Albion Online Launcher");
-
-                //var item = WgcBootstrap.CreateItemForWindow(hwnd);
-
-                ////var device = WgcBootstrap.CreateDevice();
-
-                //var device = Direct3D11Helper.CreateDevice();
-
-
-                //await WaitForCaptureToCompleteAsync(capture, item, device);
-
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     //if(string.IsNullOrEmpty(settings.BattleSettings.Name))
@@ -286,11 +244,11 @@ namespace tser
                     //    continue;
                     //}
 
-                    var frame = _capture.GetFrame();
+                    using var frame = _capture.GetFrame();
 
-                    var cropped = new Mat(frame, new OpenCvSharp.Rect(screenRegion.X, screenRegion.Y, screenRegion.Width, screenRegion.Height)).Clone();
+                    using var cropped = new Mat(frame, new OpenCvSharp.Rect(screenRegion.X, screenRegion.Y, screenRegion.Width, screenRegion.Height)).Clone();
 
-                    var debug = cropped.Clone();
+                    using var debug = cropped.Clone();
 
                     var squares = await FindSquares(cropped);
 
@@ -303,12 +261,9 @@ namespace tser
                             HersheyFonts.HersheySimplex, 0.5, Scalar.White);
                     }
 
-                    await DetectAndShowMarker(cropped, squares, debug);
+                    //await DetectAndShowMarker(cropped, squares, debug);
 
-                    context.SynchronizationContext.Post(_ =>
-                    {
-                        Cv2.ImShow("debug", debug);
-                    }, null);
+                    await ShowInContextAsync("debug", debug);
 
                     //var screen = _analyzer.CaptureRegion(screenRegion);
 
@@ -323,8 +278,6 @@ namespace tser
                     //squares = squares.Where(x => x.X != 905 && x.Y != 272).ToList();
                     //Cv2.ImShow("debug", screen);
 
-                    
-
                     await Task.Delay(100);
                 }
             }
@@ -337,6 +290,37 @@ namespace tser
             {
                 _capture.Stop();
             }
+        }
+
+        private async Task ShowInContextAsync(string windowName, Mat mat)
+        {
+            await RunInContextAsync(() =>
+            {
+                Cv2.ImShow(windowName, mat);
+            });
+        }
+
+        private async Task RunInContextAsync(Action action)
+        {
+            var tcs = new TaskCompletionSource();
+
+            context.SynchronizationContext.Post(_ =>
+            {
+                try
+                {
+                    action();
+
+                    tcs.TrySetResult();
+                }
+                catch(Exception ex)
+                {
+                    // Сигнализируем об ошибке
+                    tcs.TrySetException(ex);
+                }
+            }, null);
+
+            // Ждём завершения
+            await tcs.Task;
         }
 
         private async Task DetectAndShowMarker(Mat screen, List<OpenCvSharp.Rect> squares, Mat debug)

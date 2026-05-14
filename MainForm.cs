@@ -606,23 +606,13 @@ namespace tser
 
         private void initMarkerHelperButton_Click(object sender, EventArgs e)
         {
-            var hwnd = WgcBootstrap.FindWindow(null, "Albion Online Client");
+            var hwnd = WgcHelper.FindWindow(null, "Albion Online Client");
 
-            var item = WgcBootstrap.CreateItemForWindow(hwnd);
+            var item = WgcHelper.CreateItemForWindow(hwnd);
 
-            //var device = WgcBootstrap.CreateDevice();
-
-            var d3dDevice = new SharpDX.Direct3D11.Device(
-                    SharpDX.Direct3D.DriverType.Hardware,
-                SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport);
-
-            var device = Direct3D11Helper.CreateDevice(d3dDevice);
-
-            if (device == null)
-                throw new InvalidOperationException("Failed to create D3D11 device");
 
             var capture = new WgcCapture();
-            capture.Start(item, device, d3dDevice);
+            capture.Start(item);
 
             //await Task.Delay(1000);
             //var frame = capture.GetFrame();
