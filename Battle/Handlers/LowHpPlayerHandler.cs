@@ -151,7 +151,7 @@ namespace tser
 
             for (int i = 0; i < _count; i++)
             {
-                var multiplier = settings.BattleSettings.HightPriorityForFirst ? 1.5 : 1;
+                var multiplier = settings.BattleSettings.HightPriorityForFirst && i == 0 ? 0.7 : 1;
 
                 if (hp[i] * multiplier < min && hp[i] >= _lowLimit)
                 {
@@ -357,7 +357,7 @@ namespace tser
         {
             if (LowHpIndex >= 0)
             {
-                if (LowHpIndex > 0 && LowHpIndex < 9)
+                if (LowHpIndex >= 0 && LowHpIndex < 9)
                     sim.KeyPress((Keys)((int)Keys.D1 + LowHpIndex));
                 else if(LowHpIndex == 9 )
                     sim.KeyPress((Keys)((int)Keys.D0));
